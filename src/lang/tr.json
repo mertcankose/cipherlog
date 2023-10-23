@@ -1,0 +1,32 @@
+{
+  "translation": {
+      "hello": "Merhaba",
+      "how": "Nasıl",
+      "account": "Hesap",
+      "balance": "Bakiye",
+      "wallet": "Cüzdan",
+      "address": "Adres",
+      "language": "Dil",
+      "theme": "Tema",
+      "support": "Destek",
+      "homepage": "Ana Sayfa",
+      "ratesecret": "Secret'i Değerlendir",
+      "social": "Sosyal",
+      "system": "Sistem",
+      "light": "Açık",
+      "dark": "Koyu",
+      "notes":"Notlar",
+      "none":"Hiçbiri",
+      "normal":"Normal",
+      "medium":"Orta",
+      "urgent":"Acil",
+      "priority":"Öncelik",
+      "loading":"Yükleniyor",
+      "connectwallet":"Cüzdan Bağla",
+      "disconnectwallet":"Cüzdan Bağlantısını Kes",
+      "notSupportNetwork":"Bu ağ desteklenmiyor!",
+      "selectNetwork":"Ağ Seçiniz",
+      "notConnected":"Bağlı Değil",
+      "invalidNetwork":"Geçersiz Ağ"
+  }
+}

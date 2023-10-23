@@ -1,0 +1,37 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "src/assets/fonts/SourceCodePro-Black.ttf",
+      "sha1": "8e5b8683fa532795a46187fe848dacf8480a2905"
+    },
+    {
+      "path": "src/assets/fonts/SourceCodePro-Bold.ttf",
+      "sha1": "db1172b26c9604084db14fbdcf7fc50d2eeac670"
+    },
+    {
+      "path": "src/assets/fonts/SourceCodePro-ExtraBold.ttf",
+      "sha1": "b4e56320a90e6573209df2113e6a7d9e9c828187"
+    },
+    {
+      "path": "src/assets/fonts/SourceCodePro-ExtraLight.ttf",
+      "sha1": "e16c13598f3e39c902d40176902cfda8dfebe46f"
+    },
+    {
+      "path": "src/assets/fonts/SourceCodePro-Light.ttf",
+      "sha1": "35fffe2be10b680bdded8cfd2e6df3ae33c5774a"
+    },
+    {
+      "path": "src/assets/fonts/SourceCodePro-Medium.ttf",
+      "sha1": "79d91e3f2a3aa1b0e38c01683d00934b535b6ad0"
+    },
+    {
+      "path": "src/assets/fonts/SourceCodePro-Regular.ttf",
+      "sha1": "1f1f1620fb8f16cc55ddf7d41b314cc3cd8394b0"
+    },
+    {
+      "path": "src/assets/fonts/SourceCodePro-SemiBold.ttf",
+      "sha1": "dc2863a91c56faf5f4faa043db8d07cb9c372447"
+    }
+  ]
+}

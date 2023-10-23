@@ -1,0 +1,32 @@
+{
+    "translation": {
+      "hello":"Hello",
+      "how":"How",
+      "account":"Account",
+      "balance":"Balance",
+      "wallet":"Wallet",
+      "address":"Address",
+      "language":"Language",
+      "theme":"Theme",
+      "support":"Support",
+      "homepage":"Homepage",
+      "ratesecret":"Rate Secret",
+      "social":"Social",
+      "system":"System",
+      "light":"Light",
+      "dark":"Dark",
+      "notes":"Notes",
+      "none":"None",
+      "normal":"Normal",
+      "medium":"Medium",
+      "urgent":"Urgent",
+      "priority":"Priority",
+      "loading":"Loading",
+      "connectwallet":"Connect Wallet",
+      "disconnectwallet":"Disconnect Wallet",
+      "notSupportNetwork":"Network Not Supported!",
+      "selectNetwork":"Select Network",
+      "notConnected":"Not Connected",
+      "invalidNetwork":"Invalid Network"
+    }
+  }
