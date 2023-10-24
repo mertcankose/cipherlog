@@ -1,90 +1,64 @@
-import {FC, useRef, useMemo, useCallback} from 'react';
-import {
-  TouchableOpacity,
-  View,
-  Platform,
-  StyleSheet,
-  Dimensions,
-  ScrollView,
-} from 'react-native';
-import {useContext} from 'react';
-import {ThemeContext} from '@contexts/Theme';
-import {
-  AccountItem,
-  ConnectWalletButton,
-  Header,
-  ProfileMain,
-  TodoText,
-} from '@components';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import Octicons from 'react-native-vector-icons/Octicons';
+import { FC, useRef, useMemo, useCallback } from "react";
+import { TouchableOpacity, View, Platform, StyleSheet, Dimensions, ScrollView } from "react-native";
+import { useContext } from "react";
+import { ThemeContext } from "@contexts/Theme";
+import { AccountItem, ConnectWalletButton, Header, ProfileMain, NoteText } from "@components";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import Octicons from "react-native-vector-icons/Octicons";
 // import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
-import Fontisto from 'react-native-vector-icons/Fontisto';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import Feather from 'react-native-vector-icons/Feather';
+import Fontisto from "react-native-vector-icons/Fontisto";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import Feather from "react-native-vector-icons/Feather";
 
-import {LangContext} from '@contexts/Lang';
-import {getLanguage} from '@helpers/language-prettier';
-import {themePrettier} from '@helpers/theme-prettier';
-import BottomSheet, {
-  BottomSheetTextInput,
-  BottomSheetModal,
-  BottomSheetModalProvider,
-  BottomSheetBackdrop,
-} from '@gorhom/bottom-sheet';
-import {
-  Menu,
-  MenuOptions,
-  MenuOption,
-  MenuTrigger,
-} from 'react-native-popup-menu';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
-import CountryFlag from 'react-native-country-flag';
-import {langs} from '@constants/langs';
-import {Linking} from 'react-native';
-import {toastMessage} from '@utils/toast';
-import {WalletContext} from '@contexts/Wallet';
-import {useTranslation} from 'react-i18next';
-import {useTheme} from '@react-navigation/native';
-import {ConnectWallet} from '@thirdweb-dev/react-native';
+import { LangContext } from "@contexts/Lang";
+import { getLanguage } from "@helpers/language-prettier";
+import { themePrettier } from "@helpers/theme-prettier";
+import BottomSheet, { BottomSheetTextInput, BottomSheetModal, BottomSheetModalProvider, BottomSheetBackdrop } from "@gorhom/bottom-sheet";
+import { Menu, MenuOptions, MenuOption, MenuTrigger } from "react-native-popup-menu";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
+import CountryFlag from "react-native-country-flag";
+import { langs } from "@constants/langs";
+import { Linking } from "react-native";
+import { toastMessage } from "@utils/toast";
+import { WalletContext } from "@contexts/Wallet";
+import { useTranslation } from "react-i18next";
+import { useTheme } from "@react-navigation/native";
+import { ConnectWallet } from "@thirdweb-dev/react-native";
 
 interface IAccount {
   navigation: any;
 }
 
-const Account: FC<IAccount> = ({navigation}) => {
-  const {currentLanguage, changeLanguage} = useContext(LangContext);
-  const {activeTheme, themeValue, changeTheme} = useContext(ThemeContext);
+const Account: FC<IAccount> = ({ navigation }) => {
+  const { currentLanguage, changeLanguage } = useContext(LangContext);
+  const { activeTheme, themeValue, changeTheme } = useContext(ThemeContext);
 
-  const {t} = useTranslation();
-  const {colors} = useTheme();
+  const { t } = useTranslation();
+  const { colors } = useTheme();
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-  const snapPoints = useMemo(() => ['20%', '25%'], []);
+  const snapPoints = useMemo(() => ["20%", "25%"], []);
 
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
   }, []);
 
   const handleSheetChanges = useCallback((index: number) => {
-    console.log('handleSheetChanges', index); // 1, -1
+    console.log("handleSheetChanges", index); // 1, -1
   }, []);
 
   const openLanguageSheet = () => {
     handlePresentModalPress();
   };
 
-  const renderBackdrop = useCallback(
-    props => <BottomSheetBackdrop opacity={0.1} {...props} />,
-    [],
-  );
+  const renderBackdrop = useCallback((props) => <BottomSheetBackdrop opacity={0.1} {...props} />, []);
 
   const openLink = async (url: string) => {
     try {
       await Linking.openURL(url);
     } catch (err) {
-      toastMessage('error', 'Error', 'Something went wrong');
+      toastMessage("error", "Error", "Something went wrong");
     }
   };
 
@@ -93,11 +67,10 @@ const Account: FC<IAccount> = ({navigation}) => {
   };
 
   return (
-    <View
-      style={[styles.accountContainer, {backgroundColor: colors.background}]}>
+    <View style={[styles.accountContainer, { backgroundColor: colors.background }]}>
       <Header
         navigation={navigation}
-        text={t('account')}
+        text={t("account")}
         isBack={false}
         leftSection={
           <TouchableOpacity
@@ -105,7 +78,8 @@ const Account: FC<IAccount> = ({navigation}) => {
             activeOpacity={0.8}
             onPress={() => {
               openSidebar();
-            }}>
+            }}
+          >
             <Feather name="menu" size={24} color="#279EFF" />
           </TouchableOpacity>
         }
@@ -120,13 +94,12 @@ const Account: FC<IAccount> = ({navigation}) => {
             paddingBottom: 24,
             paddingHorizontal: 24,
           }}
-          style={{marginTop: 16}}>
-          <View style={{flexDirection: 'column', marginTop: 12, gap: 8}}>
+          style={{ marginTop: 16 }}
+        >
+          <View style={{ flexDirection: "column", marginTop: 12, gap: 8 }}>
             <AccountItem
-              itemIcon={
-                <Fontisto name="language" size={23} color={colors.primary} />
-              }
-              itemName={t('language')}
+              itemIcon={<Fontisto name="language" size={23} color={colors.primary} />}
+              itemName={t("language")}
               rightText={getLanguage(currentLanguage)}
               rightIcon={<AntDesign name="right" size={22} color="#d1d5db" />}
               onPress={() => {
@@ -139,18 +112,10 @@ const Account: FC<IAccount> = ({navigation}) => {
               <MenuTrigger>
                 <AccountItem
                   disabled
-                  itemIcon={
-                    <Ionicons
-                      name="color-palette-outline"
-                      size={24}
-                      color="#279EFF"
-                    />
-                  }
-                  itemName={t('theme')}
+                  itemIcon={<Ionicons name="color-palette-outline" size={24} color="#279EFF" />}
+                  itemName={t("theme")}
                   rightText={t(themePrettier(activeTheme))}
-                  rightIcon={
-                    <Octicons name="multi-select" size={22} color="#d1d5db" />
-                  }
+                  rightIcon={<Octicons name="multi-select" size={22} color="#d1d5db" />}
                 />
               </MenuTrigger>
               <MenuOptions
@@ -161,179 +126,148 @@ const Account: FC<IAccount> = ({navigation}) => {
                       backgroundColor: colors.background,
                     },
                   ],
-                }}>
+                }}
+              >
                 <MenuOption
                   onSelect={() => {
-                    changeTheme('system');
+                    changeTheme("system");
                   }}
                   customStyles={{
                     optionWrapper: [
                       styles.menuOptionWrapper,
                       {
                         borderBottomWidth: 1,
-                        borderBottomColor: '#f3f4f6',
+                        borderBottomColor: "#f3f4f6",
                       },
                     ],
-                  }}>
-                  <TodoText
+                  }}
+                >
+                  <NoteText
                     weight="600"
                     style={{
                       color: colors.pale,
-                    }}>
-                    {t('system')}
-                  </TodoText>
+                    }}
+                  >
+                    {t("system")}
+                  </NoteText>
                   {/* <SimpleLineIcons name="graph" size={22} color="#6b7280" /> */}
                 </MenuOption>
                 <MenuOption
                   onSelect={() => {
-                    changeTheme('light');
+                    changeTheme("light");
                   }}
                   customStyles={{
                     optionWrapper: [
                       styles.menuOptionWrapper,
                       {
                         borderBottomWidth: 1,
-                        borderBottomColor: '#f3f4f6',
+                        borderBottomColor: "#f3f4f6",
                       },
                     ],
-                  }}>
-                  <TodoText weight="600" style={{color: colors.pale}}>
-                    {t('light')}
-                  </TodoText>
+                  }}
+                >
+                  <NoteText weight="600" style={{ color: colors.pale }}>
+                    {t("light")}
+                  </NoteText>
                   {/* <SimpleLineIcons name="graph" size={22} color="#6b7280" /> */}
                 </MenuOption>
                 <MenuOption
                   onSelect={() => {
-                    changeTheme('dark');
+                    changeTheme("dark");
                   }}
                   customStyles={{
                     optionWrapper: styles.menuOptionWrapper,
-                  }}>
-                  <TodoText weight="600" style={{color: colors.pale}}>
-                    {t('dark')}
-                  </TodoText>
+                  }}
+                >
+                  <NoteText weight="600" style={{ color: colors.pale }}>
+                    {t("dark")}
+                  </NoteText>
                   {/* <SimpleLineIcons name="graph" size={22} color="#6b7280" /> */}
                 </MenuOption>
               </MenuOptions>
             </Menu>
           </View>
-          <View style={{marginTop: 12}}>
-            <TodoText
+          <View style={{ marginTop: 12 }}>
+            <NoteText
               style={[
                 styles.secretText,
                 {
                   color: colors.text,
                 },
               ]}
-              weight="600">
+              weight="600"
+            >
               NoteDapp
-            </TodoText>
+            </NoteText>
 
-            <View style={{gap: 10, flexDirection: 'column', marginTop: 8}}>
+            <View style={{ gap: 10, flexDirection: "column", marginTop: 8 }}>
               <AccountItem
-                itemIcon={
-                  <SimpleLineIcons name="support" size={23} color="#279EFF" />
-                }
-                itemName={t('support')}
-                rightIcon={
-                  <Feather name="arrow-up-right" size={22} color="#279EFF" />
-                }
+                itemIcon={<SimpleLineIcons name="support" size={23} color="#279EFF" />}
+                itemName={t("support")}
+                rightIcon={<Feather name="arrow-up-right" size={22} color="#279EFF" />}
                 onPress={() => {
-                  openLink('https://mertcankose.com');
+                  openLink("https://mertcankose.com");
                 }}
               />
               <AccountItem
-                itemIcon={
-                  <MaterialIcons name="web-asset" size={24} color="#279EFF" />
-                }
-                itemName={t('homepage')}
-                rightIcon={
-                  <Feather name="arrow-up-right" size={22} color="#279EFF" />
-                }
+                itemIcon={<MaterialIcons name="web-asset" size={24} color="#279EFF" />}
+                itemName={t("homepage")}
+                rightIcon={<Feather name="arrow-up-right" size={22} color="#279EFF" />}
                 onPress={() => {
-                  openLink('https://mertcankose.com');
+                  openLink("https://mertcankose.com");
                 }}
               />
               <AccountItem
-                itemIcon={
-                  <MaterialIcons name="star-rate" size={23} color="#279EFF" />
-                }
-                itemName={t('ratesecret')}
-                rightIcon={
-                  <Feather name="arrow-up-right" size={22} color="#279EFF" />
-                }
+                itemIcon={<MaterialIcons name="star-rate" size={23} color="#279EFF" />}
+                itemName={t("ratesecret")}
+                rightIcon={<Feather name="arrow-up-right" size={22} color="#279EFF" />}
                 onPress={() => {
-                  openLink('https://mertcankose.com');
+                  openLink("https://mertcankose.com");
                 }}
               />
             </View>
           </View>
 
-          <View style={{marginTop: 12}}>
-            <TodoText
+          <View style={{ marginTop: 12 }}>
+            <NoteText
               style={[
                 styles.socialText,
                 {
                   color: colors.text,
                 },
               ]}
-              weight="600">
-              {t('social')}
-            </TodoText>
+              weight="600"
+            >
+              {t("social")}
+            </NoteText>
 
-            <View style={{gap: 10, flexDirection: 'column', marginTop: 6}}>
+            <View style={{ gap: 10, flexDirection: "column", marginTop: 6 }}>
               <AccountItem
-                itemIcon={
-                  <SimpleLineIcons
-                    name="social-twitter"
-                    size={23}
-                    color="#279EFF"
-                  />
-                }
+                itemIcon={<SimpleLineIcons name="social-twitter" size={23} color="#279EFF" />}
                 itemName="Twitter"
-                rightIcon={
-                  <Feather name="arrow-up-right" size={22} color="#279EFF" />
-                }
+                rightIcon={<Feather name="arrow-up-right" size={22} color="#279EFF" />}
                 onPress={() => {
-                  openLink('https://twitter.com');
+                  openLink("https://twitter.com");
                 }}
               />
               <AccountItem
-                itemIcon={
-                  <SimpleLineIcons
-                    name="social-instagram"
-                    size={23}
-                    color="#279EFF"
-                  />
-                }
+                itemIcon={<SimpleLineIcons name="social-instagram" size={23} color="#279EFF" />}
                 itemName="Instagram"
-                rightIcon={
-                  <Feather name="arrow-up-right" size={22} color="#279EFF" />
-                }
+                rightIcon={<Feather name="arrow-up-right" size={22} color="#279EFF" />}
                 onPress={() => {
-                  openLink('https://instagram.com');
+                  openLink("https://instagram.com");
                 }}
               />
               <AccountItem
-                itemIcon={
-                  <SimpleLineIcons
-                    name="social-reddit"
-                    size={23}
-                    color="#279EFF"
-                  />
-                }
+                itemIcon={<SimpleLineIcons name="social-reddit" size={23} color="#279EFF" />}
                 itemName="Reddit"
-                rightIcon={
-                  <Feather name="arrow-up-right" size={22} color="#279EFF" />
-                }
+                rightIcon={<Feather name="arrow-up-right" size={22} color="#279EFF" />}
                 onPress={() => {
-                  openLink('https://reddit.com');
+                  openLink("https://reddit.com");
                 }}
               />
             </View>
           </View>
-
-          <ConnectWalletButton style={{alignSelf: 'center', marginTop: 12}} />
         </ScrollView>
       </View>
 
@@ -347,21 +281,23 @@ const Account: FC<IAccount> = ({navigation}) => {
           name="AddNoteSheet"
           backdropComponent={renderBackdrop}
           handleIndicatorStyle={{
-            backgroundColor: themeValue === 'light' ? '#000' : '#fff',
+            backgroundColor: themeValue === "light" ? "#000" : "#fff",
           }}
           handleStyle={{
-            backgroundColor: themeValue === 'light' ? '#fff' : '#61677A',
+            backgroundColor: themeValue === "light" ? "#fff" : "#61677A",
             borderTopRightRadius: 12,
             borderTopLeftRadius: 12,
-          }}>
+          }}
+        >
           <View
             style={[
               styles.languageSheetContainer,
               {
                 backgroundColor: colors.sheetBg,
               },
-            ]}>
-            {langs.map(lang => (
+            ]}
+          >
+            {langs.map((lang) => (
               <TouchableOpacity
                 key={lang.i18nCode}
                 style={[
@@ -374,22 +310,20 @@ const Account: FC<IAccount> = ({navigation}) => {
                   changeLanguage(lang.i18nCode);
                   bottomSheetModalRef.current?.close();
                 }}
-                activeOpacity={0.8}>
-                <TodoText
+                activeOpacity={0.8}
+              >
+                <NoteText
                   weight="500"
                   style={[
                     styles.languageText,
                     {
                       color: colors.text,
                     },
-                  ]}>
+                  ]}
+                >
                   {lang.text}
-                </TodoText>
-                <CountryFlag
-                  isoCode={lang.isoCode}
-                  size={22}
-                  style={{borderRadius: 3}}
-                />
+                </NoteText>
+                <CountryFlag isoCode={lang.isoCode} size={22} style={{ borderRadius: 3 }} />
               </TouchableOpacity>
             ))}
           </View>
@@ -407,7 +341,7 @@ const styles = StyleSheet.create({
   },
   accountInnerContainer: {
     flex: 1,
-    flexDirection: 'column',
+    flexDirection: "column",
     paddingVertical: 24,
   },
   hamburgerMenuButton: {},
@@ -421,16 +355,16 @@ const styles = StyleSheet.create({
   },
   languageSheetContainer: {
     flex: 1,
-    flexDirection: 'column',
+    flexDirection: "column",
     gap: 10,
     paddingHorizontal: 16,
     paddingVertical: 4,
-    paddingBottom: Platform.OS === 'ios' ? 4 : 4,
+    paddingBottom: Platform.OS === "ios" ? 4 : 4,
   },
   languageButton: {
     borderWidth: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     borderRadius: 8,
     paddingVertical: 10,
     paddingHorizontal: 10,
@@ -439,25 +373,25 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   profileMain: {
-    flexDirection: 'column',
-    alignItems: 'center',
+    flexDirection: "column",
+    alignItems: "center",
   },
   priorityTriggerButton: {
     borderWidth: 1,
-    borderColor: '#ddd',
-    flexDirection: 'row',
+    borderColor: "#ddd",
+    flexDirection: "row",
     gap: 6,
     borderRadius: 6,
     paddingHorizontal: 8,
     paddingVertical: 4,
-    alignItems: 'center',
+    alignItems: "center",
   },
   menuOptionsContainer: {
-    marginTop: Platform.OS === 'ios' ? 30 : 30,
-    marginLeft: Dimensions.get('window').width / 3,
+    marginTop: Platform.OS === "ios" ? 30 : 30,
+    marginLeft: Dimensions.get("window").width / 3,
     marginRight: 0,
     borderRadius: 6,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 1,
@@ -469,9 +403,9 @@ const styles = StyleSheet.create({
   },
 
   menuOptionWrapper: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 12,
     paddingVertical: 8,
   },

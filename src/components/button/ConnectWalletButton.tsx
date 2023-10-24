@@ -1,22 +1,15 @@
-import React, {FC, useContext} from 'react';
-import {
-  TouchableOpacity,
-  TouchableOpacityProps,
-  StyleSheet,
-} from 'react-native';
-import TodoText from '@components/text/TodoText';
-import {WalletContext} from '@contexts/Wallet';
-import {useTranslation} from 'react-i18next';
+import React, { FC, useContext } from "react";
+import { TouchableOpacity, TouchableOpacityProps, StyleSheet } from "react-native";
+import NoteText from "@components/text/NoteText";
+import { WalletContext } from "@contexts/Wallet";
+import { useTranslation } from "react-i18next";
 
 interface IConnectWalletButtonProps extends TouchableOpacityProps {
   style?: any;
 }
 
-const ConnectWalletButton: FC<IConnectWalletButtonProps> = ({
-  style,
-  ...props
-}) => {
-  const {t} = useTranslation();
+const ConnectWalletButton: FC<IConnectWalletButtonProps> = ({ style, ...props }) => {
+  const { t } = useTranslation();
 
   const handlePress = () => {
     // if (isConnected) {
@@ -35,10 +28,11 @@ const ConnectWalletButton: FC<IConnectWalletButtonProps> = ({
         // isConnected ? styles.disconnectedButton : styles.connectedButton,
         style,
       ]}
-      {...props}>
-      <TodoText style={styles.text} weight="600">
+      {...props}
+    >
+      <NoteText style={styles.text} weight="600">
         {/* {isConnected ? t('disconnectwallet') : t('connectwallet')} */}
-      </TodoText>
+      </NoteText>
     </TouchableOpacity>
   );
 };
@@ -48,17 +42,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 15,
     borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   connectedButton: {
-    backgroundColor: 'primary', // Replace 'primary' with your actual primary color
+    backgroundColor: "primary", // Replace 'primary' with your actual primary color
   },
   disconnectedButton: {
-    backgroundColor: 'red',
+    backgroundColor: "red",
   },
   text: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
   },
 });

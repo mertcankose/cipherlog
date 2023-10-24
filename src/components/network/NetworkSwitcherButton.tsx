@@ -1,25 +1,17 @@
-import {FC, useContext} from 'react';
-import {
-  TouchableOpacity,
-  TouchableOpacityProps,
-  StyleSheet,
-} from 'react-native';
-import TodoText from '@components/text/TodoText';
+import { FC, useContext } from "react";
+import { TouchableOpacity, TouchableOpacityProps, StyleSheet } from "react-native";
+import NoteText from "@components/text/NoteText";
 
-import {useTranslation} from 'react-i18next';
-import {networkNamePrettier} from '@helpers/network-name-prettier';
+import { useTranslation } from "react-i18next";
+import { networkNamePrettier } from "@helpers/network-name-prettier";
 
 interface INetworkSwticherButton extends TouchableOpacityProps {
   style?: any;
   openModal: () => void;
 }
 
-const NetworkSwitcherButton: FC<INetworkSwticherButton> = ({
-  style,
-  openModal = () => {},
-  ...props
-}) => {
-  const {t} = useTranslation();
+const NetworkSwitcherButton: FC<INetworkSwticherButton> = ({ style, openModal = () => {}, ...props }) => {
+  const { t } = useTranslation();
 
   const getActiveNetworkName = () => {
     // if (isConnected) {
@@ -49,10 +41,11 @@ const NetworkSwitcherButton: FC<INetworkSwticherButton> = ({
         // isConnected ? styles.connectedButton : styles.disconnectedButton,
         style,
       ]}
-      {...props}>
-      <TodoText style={styles.text} weight="600">
+      {...props}
+    >
+      <NoteText style={styles.text} weight="600">
         {getActiveNetworkName()}
-      </TodoText>
+      </NoteText>
     </TouchableOpacity>
   );
 };
@@ -62,17 +55,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
     borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'flex-end',
+    justifyContent: "center",
+    alignItems: "flex-end",
   },
   connectedButton: {
-    backgroundColor: 'primary', // Replace 'primary' with your actual primary color
+    backgroundColor: "primary", // Replace 'primary' with your actual primary color
   },
   disconnectedButton: {
-    backgroundColor: 'red',
+    backgroundColor: "red",
   },
   text: {
-    color: 'white',
+    color: "white",
     fontSize: 12,
   },
 });

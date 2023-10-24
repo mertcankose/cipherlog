@@ -1,9 +1,9 @@
-import {useContext} from 'react';
-import {FlatList, View, StyleSheet} from 'react-native';
-import NetworkItem from './NetworkItem';
-import BaseModal from '@components/modal/BaseModal';
-import TodoText from '@components/text/TodoText';
-import {useTranslation} from 'react-i18next';
+import { useContext } from "react";
+import { FlatList, View, StyleSheet } from "react-native";
+import NetworkItem from "./NetworkItem";
+import BaseModal from "@components/modal/BaseModal";
+import NoteText from "@components/text/NoteText";
+import { useTranslation } from "react-i18next";
 
 interface INetworkModal {
   visibility: boolean;
@@ -11,12 +11,8 @@ interface INetworkModal {
   closeModal: () => void;
 }
 
-const NetworkModal = ({
-  visibility,
-  selectNetwork = (network: IApplicableNetwork) => {},
-  closeModal = () => {},
-}) => {
-  const {t} = useTranslation();
+const NetworkModal = ({ visibility, selectNetwork = (network: IApplicableNetwork) => {}, closeModal = () => {} }) => {
+  const { t } = useTranslation();
 
   const networkBarStyle = (network: IApplicableNetwork) => {
     switch (network.chainId) {
@@ -50,14 +46,14 @@ const NetworkModal = ({
   return (
     <BaseModal visibility={visibility} closeModal={closeModal}>
       <>
-        <TodoText style={styles.modalTitle}>{t('selectNetwork')}</TodoText>
+        <NoteText style={styles.modalTitle}>{t("selectNetwork")}</NoteText>
 
         <FlatList
           data={[]}
           scrollEnabled={true}
           contentContainerStyle={styles.flatListContainer}
           showsVerticalScrollIndicator={false}
-          renderItem={({item}) => (
+          renderItem={({ item }) => (
             <View style={[styles.networkWrapper, networkWrapperStyle(item)]}>
               <View style={[styles.bar, networkBarStyle(item)]} />
               <NetworkItem
@@ -68,7 +64,7 @@ const NetworkModal = ({
               />
             </View>
           )}
-          keyExtractor={item => item?.chainId || '0'}
+          keyExtractor={(item) => item?.chainId || "0"}
           ItemSeparatorComponent={() => <View style={styles.separator}></View>}
         />
       </>
@@ -80,38 +76,38 @@ export default NetworkModal;
 
 const styles = StyleSheet.create({
   modalTitle: {
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 1.5,
   },
   flatListContainer: {
     paddingTop: 12,
     paddingBottom: 12,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   networkWrapper: {
-    flexDirection: 'row',
+    flexDirection: "row",
     borderRadius: 4,
-    overflow: 'hidden',
+    overflow: "hidden",
     borderWidth: 1,
-    borderColor: 'gray',
+    borderColor: "gray",
     marginBottom: 2,
   },
   bar: {
     width: 3,
-    height: '100%',
+    height: "100%",
     marginRight: 1,
   },
   redBar: {
-    backgroundColor: 'red',
+    backgroundColor: "red",
   },
   primaryBar: {
-    backgroundColor: 'primary', // Replace 'primary' with your actual primary color
+    backgroundColor: "primary", // Replace 'primary' with your actual primary color
   },
   yellowBar: {
-    backgroundColor: 'yellow',
+    backgroundColor: "yellow",
   },
   purpleBar: {
-    backgroundColor: 'purple',
+    backgroundColor: "purple",
   },
   networkItem: {
     paddingVertical: 3,
@@ -122,14 +118,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   whiteText: {
-    color: 'white',
+    color: "white",
   },
   blackText: {
-    color: 'black',
+    color: "black",
   },
   separator: {
     height: 0.5,
     marginVertical: 2,
-    backgroundColor: 'gray',
+    backgroundColor: "gray",
   },
 });

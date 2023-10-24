@@ -1,10 +1,10 @@
-import {View} from 'react-native';
-import {TodoText} from '@components';
+import { View } from "react-native";
+import { NoteText } from "@components";
 
 const NoteDetail = () => {
   return (
     <View>
-      <TodoText>Note Detail</TodoText>
+      <NoteText>Note Detail</NoteText>
     </View>
   );
 };

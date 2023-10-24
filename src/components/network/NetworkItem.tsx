@@ -1,11 +1,7 @@
-import React, {FC} from 'react';
-import {
-  TouchableOpacity,
-  TouchableOpacityProps,
-  StyleSheet,
-} from 'react-native';
-import TodoText from '@components/text/TodoText';
-import {networkNamePrettier} from '@helpers/network-name-prettier';
+import React, { FC } from "react";
+import { TouchableOpacity, TouchableOpacityProps, StyleSheet } from "react-native";
+import NoteText from "@components/text/NoteText";
+import { networkNamePrettier } from "@helpers/network-name-prettier";
 
 interface INetworkItemProps extends TouchableOpacityProps {
   style?: any;
@@ -14,13 +10,7 @@ interface INetworkItemProps extends TouchableOpacityProps {
   textStyle?: any;
 }
 
-const NetworkItem: FC<INetworkItemProps> = ({
-  network,
-  pressNetwork = () => {},
-  style,
-  textStyle,
-  ...props
-}) => {
+const NetworkItem: FC<INetworkItemProps> = ({ network, pressNetwork = () => {}, style, textStyle, ...props }) => {
   return (
     <TouchableOpacity
       activeOpacity={0.7}
@@ -28,11 +18,12 @@ const NetworkItem: FC<INetworkItemProps> = ({
         pressNetwork(network);
       }}
       style={[styles.container, style]}
-      {...props}>
-      <TodoText style={[styles.text, textStyle]}>
+      {...props}
+    >
+      <NoteText style={[styles.text, textStyle]}>
         {/* {networkNamePrettier(network.networkName, 20)} */}
         {network.networkName}
-      </TodoText>
+      </NoteText>
     </TouchableOpacity>
   );
 };
@@ -42,8 +33,8 @@ const styles = StyleSheet.create({
     // Add your TouchableOpacity styles here
   },
   text: {
-    color: 'black',
-    // Add your TodoText styles here
+    color: "black",
+    // Add your NoteText styles here
   },
 });
 

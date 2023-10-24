@@ -1,8 +1,8 @@
-import React, {FC, ReactNode} from 'react';
-import {View, TouchableOpacity, StyleSheet} from 'react-native';
-import TodoText from '@components/text/TodoText';
-import Octicons from 'react-native-vector-icons/Octicons';
-import {useTheme} from '@react-navigation/native';
+import React, { FC, ReactNode } from "react";
+import { View, TouchableOpacity, StyleSheet } from "react-native";
+import NoteText from "@components/text/NoteText";
+import Octicons from "react-native-vector-icons/Octicons";
+import { useTheme } from "@react-navigation/native";
 
 interface IHeader {
   text: string;
@@ -14,17 +14,8 @@ interface IHeader {
   isThree?: boolean;
 }
 
-const Header: FC<IHeader> = ({
-  navigation,
-  text,
-  leftSection = <View></View>,
-  rightSection,
-  style,
-  isBack,
-  isThree,
-  ...props
-}) => {
-  const {colors} = useTheme();
+const Header: FC<IHeader> = ({ navigation, text, leftSection = <View></View>, rightSection, style, isBack, isThree, ...props }) => {
+  const { colors } = useTheme();
 
   const goBack = () => {
     navigation.goBack();
@@ -39,14 +30,16 @@ const Header: FC<IHeader> = ({
         },
         style,
       ]}
-      {...props}>
+      {...props}
+    >
       <View style={styles.headerLeft}>
         {isBack ? (
           <TouchableOpacity
             onPress={goBack}
-            hitSlop={{top: 16, bottom: 16, left: 16, right: 16}}
+            hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
             activeOpacity={0.8}
-            style={styles.backButton}>
+            style={styles.backButton}
+          >
             <Octicons
               name="chevron-left"
               size={20}
@@ -57,16 +50,17 @@ const Header: FC<IHeader> = ({
           <View style={styles.leftSection}>{leftSection}</View>
         )}
 
-        <TodoText
+        <NoteText
           style={[
             styles.headerText,
             {
               color: colors.primary,
             },
           ]}
-          weight="700">
+          weight="700"
+        >
           {text}
-        </TodoText>
+        </NoteText>
       </View>
       {isThree && <View style={styles.rightSection}>{rightSection}</View>}
     </View>
@@ -75,9 +69,9 @@ const Header: FC<IHeader> = ({
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingLeft: 20,
     paddingRight: 20,
     borderBottomWidth: 0.4,
@@ -86,8 +80,8 @@ const styles = StyleSheet.create({
     paddingBottom: 6,
   },
   headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   backButton: {
     marginRight: 10,
@@ -97,10 +91,11 @@ const styles = StyleSheet.create({
     fontSize: 22,
     lineHeight: 35,
     marginLeft: 8,
-    color: '#000', // Change to your desired color
+    color: "#000", // Change to your desired color
   },
   rightSection: {
     flex: 1,
+    alignItems: "flex-end",
   },
 });
 

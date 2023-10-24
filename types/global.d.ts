@@ -1,12 +1,13 @@
 /// <reference types="nativewind/types" />
 
-type languageType = 'en' | 'tr';
+type languageType = "en" | "tr";
 
 interface INote {
-  noteId?: number;
+  noteId: string;
   noteTitle: string;
-  noteContent?: string;
-  priority: number;
+  noteContent: string;
+  notePriority: number;
+  noteDate: string;
 }
 
 interface IPagination {
