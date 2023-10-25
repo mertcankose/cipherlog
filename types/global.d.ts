@@ -1,13 +1,14 @@
 /// <reference types="nativewind/types" />
 
-type languageType = "en" | "tr";
+type languageType = 'en' | 'tr';
 
 interface INote {
-  noteId: string;
-  noteTitle: string;
-  noteContent: string;
-  notePriority: number;
-  noteDate: string;
+  id: string;
+  title: string;
+  content: string;
+  priority: number;
+  createdAt: number;
+  updatedAt: number;
 }
 
 interface IPagination {
@@ -29,4 +30,9 @@ interface IApplicableNetwork {
 interface IChainId {
   chainId: string | undefined;
   chainIdHex: string | undefined;
+}
+
+declare module '@env' {
+  export const THIRD_WEB_PROJECT_ID: string;
+  export const CONTRACT_ADDRESS: string;
 }

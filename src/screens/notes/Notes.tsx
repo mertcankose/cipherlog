@@ -1,71 +1,39 @@
-import { Header, NetworkModal, SecretItem, NoteButton, NoteText } from "@components";
-import { useContext, FC, useRef, useMemo, useCallback, useEffect, useState } from "react";
-import { FlatList, View, StyleSheet, Platform, TouchableOpacity, RefreshControl, TextInput, Keyboard } from "react-native";
-import Octicons from "react-native-vector-icons/Octicons";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
-import BottomSheet, { BottomSheetTextInput, BottomSheetBackdrop } from "@gorhom/bottom-sheet";
-import { Menu, MenuOptions, MenuOption, MenuTrigger } from "react-native-popup-menu";
-import { FlashList, FlashListProps } from "@shopify/flash-list";
-import Feather from "react-native-vector-icons/Feather";
-import { ThemeContext } from "@contexts/Theme";
-import { useTranslation } from "react-i18next";
-import { useTheme } from "@react-navigation/native";
-import useKeyboardVisibility from "@hooks/useKeyboardVisibility";
-import { useAddress } from "@thirdweb-dev/react-core";
-import { NativeViewGestureHandler } from "react-native-gesture-handler";
+import {Header, NetworkModal, SecretItem, NoteButton, NoteText} from '@components';
+import {useContext, FC, useRef, useMemo, useCallback, useEffect, useState} from 'react';
+import {FlatList, View, StyleSheet, Platform, TouchableOpacity, RefreshControl, TextInput, Keyboard, ActivityIndicator} from 'react-native';
+import Octicons from 'react-native-vector-icons/Octicons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
+import BottomSheet, {BottomSheetTextInput, BottomSheetBackdrop} from '@gorhom/bottom-sheet';
+import {Menu, MenuOptions, MenuOption, MenuTrigger} from 'react-native-popup-menu';
+import {FlashList, FlashListProps} from '@shopify/flash-list';
+import Feather from 'react-native-vector-icons/Feather';
+import {ThemeContext} from '@contexts/Theme';
+import {useTranslation} from 'react-i18next';
+import {useTheme} from '@react-navigation/native';
+import useKeyboardVisibility from '@hooks/useKeyboardVisibility';
+import {Web3Button} from '@thirdweb-dev/react-native';
+import {NativeViewGestureHandler} from 'react-native-gesture-handler';
+import {WalletContext} from '@contexts/Wallet';
+import {ethers} from 'ethers';
+import {toastMessage} from '@utils/toast';
+import {getNotePriorityColor} from '@helpers/priority-control';
 
 interface INotes {
   navigation: any;
 }
 
-const Notes: FC<INotes> = ({ navigation }) => {
+const Notes: FC<INotes> = ({navigation}) => {
   /* NOTES STATES*/
-  const [notes, setNotes] = useState<INote[]>([
-    {
-      noteId: "0",
-      noteTitle: "First Item",
-      noteContent:
-        "Yeah that is crazy, but people can change their own picture and build their own Twitter conversation with this generator, so it does not matter that you are an egg",
-      notePriority: 0,
-      noteDate: "17 Sep",
-    },
-    {
-      noteId: "1",
-      noteTitle: "Second Item",
-      noteContent: "Thanks mate! Feel way better now. Oh, and guys, these messages will be removed once your add your own :-)",
-      notePriority: 0,
-      noteDate: "18 Sep",
-    },
-    {
-      noteId: "2",
-      noteTitle: "Third Item",
-      noteContent: "Hello there. Thanks for the follow. Did you notice, that I am an egg? A talking egg? Damn!",
-      notePriority: 0,
-      noteDate: "19 Sep",
-    },
-    {
-      noteId: "3",
-      noteTitle: "Forth Item",
-      noteContent: "Hello there. Thanks for the follow. Did you notice, that I am an egg? A talking egg? Damn!",
-      notePriority: 2,
-      noteDate: "20 Sep",
-    },
-    {
-      noteId: "4",
-      noteTitle: "Fifth Item",
-      noteContent: "Hello there. Thanks for the follow. Did you notice, that I am an egg? A talking egg? Damn!",
-      notePriority: 1,
-      noteDate: "10 Sep",
-    },
-  ]);
+  const [notes, setNotes] = useState<INote[]>([]);
 
   const [note, setNote] = useState<INote>({
-    noteId: "0",
-    noteTitle: "",
-    noteContent: "",
-    notePriority: 0, // 0, 1 ,2, 3
-    noteDate: "",
+    id: '0',
+    title: '',
+    content: '',
+    priority: 0, // 0, 1 ,2, 3
+    createdAt: 0,
+    updatedAt: 0,
   });
   const [selectedNoteId, setSelectedNoteId] = useState<string>();
   const [refreshingNotes, setRefreshingNotes] = useState<boolean>(false);
@@ -74,20 +42,71 @@ const Notes: FC<INotes> = ({ navigation }) => {
   const panRef = useRef<any>(null);
 
   /* WEB3 */
-  const address = useAddress();
+  const {
+    // addresses
+    userAddress,
+    contractAddress,
+    // pagination
+    page,
+    setPage,
+    resultsPerPage,
+    setResultsPerPage,
+    // contract
+    isLoadingContract,
+    errorContract,
+    // user notes
+    userNotes,
+    isLoadingUserNotes,
+    errorUserNotes,
+    // mutate note
+    mutateNote,
+    isLoadingMutateNote,
+    errorMutateNote,
+    isSuccessMutateNote,
+    // update note
+    updateNote,
+    isLoadingUpdateNote,
+    errorUpdateNote,
+    // delete note
+    deleteNote,
+    isLoadingDeleteNote,
+    errorDeleteNote,
+  } = useContext(WalletContext);
   const [networkModalVisible, setNetworkModalVisible] = useState<boolean>(false);
 
   /* THEME AND LANG */
-  const { activeTheme, themeValue, changeTheme } = useContext(ThemeContext);
-  const { t } = useTranslation();
-  const { colors } = useTheme();
+  const {activeTheme, themeValue, changeTheme} = useContext(ThemeContext);
+  const {t} = useTranslation();
+  const {colors} = useTheme();
 
   /* BOTTOM SHEET START*/
   const isKeyboardVisible = useKeyboardVisibility();
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ["30%"], []);
+  const snapPoints = useMemo(() => ['30%'], []);
   const [isBottomSheetVisible, setIsBottomSheetVisible] = useState<boolean>(false);
   const textInputRef = useRef<TextInput>(null);
+
+  useEffect(() => {
+    if (userNotes) {
+      const transformedData = transformData(userNotes);
+      console.log('usernotes: ', transformedData);
+      setNotes(transformedData);
+    }
+  }, [userNotes]);
+
+  useEffect(() => {
+    if (isSuccessMutateNote) {
+      bottomSheetRef.current?.close();
+      setNote({
+        id: '0',
+        title: '',
+        content: '',
+        priority: 0, // 0, 1 ,2, 3
+        createdAt: 0,
+        updatedAt: 0,
+      });
+    }
+  }, [isSuccessMutateNote]);
 
   useEffect(() => {
     if (!isBottomSheetVisible) {
@@ -113,7 +132,7 @@ const Notes: FC<INotes> = ({ navigation }) => {
   }, [isBottomSheetVisible]);
 
   const handleSheetChanges = useCallback((index: number) => {
-    console.log("handleSheetChanges", index); // 0, -1
+    console.log('handleSheetChanges', index); // 0, -1
     if (index == -1) {
       setIsBottomSheetVisible(false);
     } else {
@@ -121,14 +140,9 @@ const Notes: FC<INotes> = ({ navigation }) => {
     }
   }, []);
 
-  const renderBackdrop = useCallback(
-    (props) => <BottomSheetBackdrop appearsOnIndex={1} disappearsOnIndex={-1} opacity={0.1} {...props} />,
-    []
-  );
+  const renderBackdrop = useCallback(props => <BottomSheetBackdrop appearsOnIndex={1} disappearsOnIndex={-1} opacity={0.1} {...props} />, []);
 
-  {
-    /* APP SPESIFIC METHODS */
-  }
+  /* APP SPESIFIC METHODS */
   const openSidebar = () => {
     navigation.openDrawer();
   };
@@ -142,83 +156,66 @@ const Notes: FC<INotes> = ({ navigation }) => {
     return 10;
   };
 
-  {
-    /* NOTES METHODS */
-  }
-  const getNotes = async () => {
-    // console.log('provider: ', provider);
-    /*
-    let notes = await getNotesBySenderWithPagination({
-      page: 1,
-      resultsPerPage: 4,
-    });
-    //getNotesBySender();
-    */
-  };
-
   const onRefreshNotes = useCallback(() => {
     setRefreshingNotes(true);
+
     setTimeout(() => {
       setRefreshingNotes(false);
-    }, 2000);
+    }, 1000);
   }, []);
 
   const getNotePriorityName = () => {
-    return note.notePriority === 0
-      ? t("priority")
-      : note.notePriority === 1
-      ? t("normal")
-      : note.notePriority === 2
-      ? t("medium")
-      : t("urgent");
+    return note.priority === 0 ? t('priority') : note.priority === 1 ? t('normal') : note.priority === 2 ? t('medium') : t('urgent');
   };
 
-  const getNotePriorityIconColor = () => {
-    return note.notePriority === 0
-      ? themeValue === "light"
+  /*
+  const getNotePriorityColor = () => {
+    return note.priority === 0
+      ? themeValue === 'light'
         ? colors.none
-        : "#fff"
-      : note.notePriority === 1
+        : '#fff'
+      : note.priority === 1
       ? colors.normal
-      : note.notePriority === 2
+      : note.priority === 2
       ? colors.medium
       : colors.urgent;
   };
+  */
 
-  const getNotePriorityTextColor = () => {
-    return note.notePriority === 0
-      ? themeValue === "light"
-        ? colors.none
-        : "#fff"
-      : note.notePriority === 1
-      ? colors.normal
-      : note.notePriority === 2
-      ? colors.medium
-      : colors.urgent;
+  const transformData = inputData => {
+    return inputData
+      .filter(([id, title, content, priority, createdAt, updatedAt]) => title.length > 0)
+      .map(([id, title, content, priority, createdAt, updatedAt]) => {
+        const parseAndFormat = value => ethers.utils.formatUnits(JSON.parse(value), 0);
+
+        return {
+          id: parseAndFormat(id),
+          title,
+          content,
+          priority,
+          createdAt: parseAndFormat(createdAt),
+          updatedAt: parseAndFormat(updatedAt),
+        };
+      });
   };
 
-  const addNoteToChain = () => {
-    console.log("addNoteToChain", note);
+  const addNoteToChain = async () => {
+    console.log('addNoteToChain', note);
+    let createdAt = Math.floor(Date.now() / 1000);
 
-    // when loading done
-    setNote({
-      noteId: "0",
-      noteTitle: "",
-      noteContent: "",
-      notePriority: 0, // 0, 1 ,2, 3
-      noteDate: "",
-    });
-    bottomSheetRef.current?.close();
+    try {
+      let result = await mutateNote({args: [note.title, note.content, note.priority, createdAt, createdAt]});
+
+      console.log('result: ', result);
+    } catch (error) {
+      toastMessage('error', 'Error', 'There is a problem to set note');
+    }
   };
 
-  const deleteNote = (id: string) => {
-    console.log("deleteNote", id);
-    setNotes(notes.filter((note) => note.noteId !== id));
+  const removeNote = (id: string) => {
+    // console.log("removeNote", id);
+    setNotes(notes.filter(note => note.id !== id));
   };
-
-  // useEffect(() => {
-  //   console.log("notes: ", notes);
-  // }, [notes]);
 
   return (
     <View
@@ -227,27 +224,25 @@ const Notes: FC<INotes> = ({ navigation }) => {
         {
           backgroundColor: colors.background,
         },
-      ]}
-    >
+      ]}>
       <Header
         navigation={navigation}
-        text={t("notes")}
+        text={t('notes')}
         isBack={false}
         isThree={true}
         leftSection={
           <TouchableOpacity
-            style={{ flexDirection: "row" }}
+            style={{flexDirection: 'row'}}
             activeOpacity={0.8}
             onPress={() => {
               openSidebar();
-            }}
-          >
+            }}>
             <Feather name="menu" size={24} color="#279EFF" />
           </TouchableOpacity>
         }
         rightSection={
           <TouchableOpacity onPress={openSidebar} activeOpacity={0.7}>
-            {address ? (
+            {userAddress ? (
               <NoteText
                 style={[
                   styles.connectedText,
@@ -255,8 +250,7 @@ const Notes: FC<INotes> = ({ navigation }) => {
                     color: colors.primary,
                   },
                 ]}
-                weight="600"
-              >
+                weight="600">
                 Connected
               </NoteText>
             ) : (
@@ -277,7 +271,22 @@ const Notes: FC<INotes> = ({ navigation }) => {
         }}
       />
 
-      <View style={{ flex: 1 }}>
+      {isLoadingMutateNote && <ActivityIndicator size="large" color={colors.primary} style={{marginTop: 10}} />}
+
+      {/* <Web3Button contractAddress={contractAddress} action={() => mutateNote({args: ['Hello', 'Hii', 2]})}>
+        Send Transaction
+      </Web3Button>
+
+      <Web3Button
+        contractAddress={contractAddress}
+        action={async () => {
+          let result = await mutateUserAllNotes({args: []});
+          console.log('result: ', result);
+        }}>
+        Get Notes
+      </Web3Button> */}
+
+      <View style={{flex: 1}}>
         <NativeViewGestureHandler ref={flashlistRef} simultaneousHandlers={panRef}>
           <FlatList
             data={notes}
@@ -287,32 +296,33 @@ const Notes: FC<INotes> = ({ navigation }) => {
               paddingTop: 12,
             }}
             showsVerticalScrollIndicator={false}
-            renderItem={({ item }) => (
+            renderItem={({item}) => (
               <SecretItem
                 // onPress={() => setSelectedNoteId(item.id)}
-                id={item.noteId}
-                title={item.noteTitle}
-                content={item.noteContent}
-                date={item.noteDate}
-                priority={item.notePriority}
-                onDelete={deleteNote}
-                key={item.noteId}
+                key={item.id}
+                id={item.id}
+                title={item.title}
+                content={item.content}
+                createdAt={item.createdAt}
+                updatedAt={item.updatedAt}
+                priority={item.priority}
+                onDelete={removeNote}
                 simultaneousHandler={flashlistRef}
                 panRef={panRef}
               />
             )}
-            keyExtractor={(item) => item.noteId}
+            keyExtractor={item => item.id}
             ItemSeparatorComponent={() => (
               <View
                 style={{
                   height: 0,
-                  backgroundColor: "#ddd",
+                  backgroundColor: '#ddd',
                   marginVertical: 0,
                 }}
               />
             )}
             extraData={selectedNoteId}
-            refreshControl={<RefreshControl refreshing={refreshingNotes} onRefresh={onRefreshNotes} />}
+            refreshControl={<RefreshControl refreshing={refreshingNotes} onRefresh={onRefreshNotes} colors={[colors.primary]} tintColor={colors.primary} />}
             refreshing={refreshingNotes}
             // estimatedItemSize={4}
           />
@@ -322,17 +332,16 @@ const Notes: FC<INotes> = ({ navigation }) => {
       <NoteButton
         onPress={handleSheetPress}
         style={{
-          position: "absolute",
+          position: 'absolute',
           bottom: 48,
           right: 32,
           borderWidth: 0,
           width: 56,
           height: 56,
           borderRadius: 28,
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
         <Octicons name="plus" size={26} color="#fff" />
       </NoteButton>
 
@@ -347,14 +356,13 @@ const Notes: FC<INotes> = ({ navigation }) => {
         // keyboardBehavior="interactive"
         // keyboardBlurBehavior="restore"
         handleIndicatorStyle={{
-          backgroundColor: themeValue === "light" ? "#000" : "#fff",
+          backgroundColor: themeValue === 'light' ? '#000' : '#fff',
         }}
         handleStyle={{
-          backgroundColor: themeValue === "light" ? "#fff" : "#61677A",
+          backgroundColor: themeValue === 'light' ? '#fff' : '#61677A',
           borderTopRightRadius: 12,
           borderTopLeftRadius: 12,
-        }}
-      >
+        }}>
         <View
           style={[
             styles.bottomsheetInnerContainer,
@@ -362,19 +370,17 @@ const Notes: FC<INotes> = ({ navigation }) => {
               backgroundColor: colors.sheetBg,
               paddingBottom: dynamicPaddingBottom(),
             },
-          ]}
-        >
+          ]}>
           <View
             style={{
-              flexDirection: "column",
+              flexDirection: 'column',
               marginBottom: 2,
-            }}
-          >
+            }}>
             <BottomSheetTextInput
               // @ts-ignore
               ref={textInputRef as RefObject<TextInput>}
-              value={note.noteTitle}
-              onChangeText={(text) => setNote({ ...note, noteTitle: text })}
+              value={note.title}
+              onChangeText={text => setNote({...note, title: text})}
               placeholder="Title"
               maxLength={36}
               selectionColor={colors.inputSelection}
@@ -382,8 +388,8 @@ const Notes: FC<INotes> = ({ navigation }) => {
               style={styles.bottomSheetTitleInput}
             />
             <BottomSheetTextInput
-              defaultValue={note.noteContent}
-              onChangeText={(text) => setNote({ ...note, noteContent: text })}
+              defaultValue={note.content}
+              onChangeText={text => setNote({...note, content: text})}
               placeholder="Description"
               blurOnSubmit={false}
               numberOfLines={4}
@@ -398,33 +404,30 @@ const Notes: FC<INotes> = ({ navigation }) => {
           <View style={styles.sheetModalBottom}>
             <Menu>
               <MenuTrigger style={styles.priorityTriggerButton}>
-                <SimpleLineIcons name="graph" size={22} color={getNotePriorityIconColor()} />
-                <NoteText style={[{ color: getNotePriorityTextColor() }]} weight="800">
+                <SimpleLineIcons name="graph" size={22} color={getNotePriorityColor(themeValue, colors, note.priority)} />
+                <NoteText style={[{color: getNotePriorityColor(themeValue, colors, note.priority)}]} weight="800">
                   {getNotePriorityName()}
                 </NoteText>
               </MenuTrigger>
               <MenuOptions
                 customStyles={{
                   optionsContainer: styles.menuOptionsContainer,
-                }}
-              >
+                }}>
                 <MenuOption
                   onSelect={() =>
                     setNote({
                       ...note,
-                      notePriority: 0,
+                      priority: 0,
                     })
                   }
                   customStyles={{
                     optionWrapper: styles.menuOptionWrapper,
-                  }}
-                >
+                  }}>
                   <NoteText
                     style={{
                       color: colors.none,
-                    }}
-                  >
-                    {t("none")}
+                    }}>
+                    {t('none')}
                   </NoteText>
                   <SimpleLineIcons name="graph" size={22} color={colors.none} />
                 </MenuOption>
@@ -432,19 +435,17 @@ const Notes: FC<INotes> = ({ navigation }) => {
                   onSelect={() =>
                     setNote({
                       ...note,
-                      notePriority: 1,
+                      priority: 1,
                     })
                   }
                   customStyles={{
                     optionWrapper: styles.menuOptionWrapper,
-                  }}
-                >
+                  }}>
                   <NoteText
                     style={{
                       color: colors.normal,
-                    }}
-                  >
-                    {t("normal")}
+                    }}>
+                    {t('normal')}
                   </NoteText>
                   <SimpleLineIcons name="graph" size={22} color={colors.normal} />
                 </MenuOption>
@@ -452,19 +453,17 @@ const Notes: FC<INotes> = ({ navigation }) => {
                   onSelect={() =>
                     setNote({
                       ...note,
-                      notePriority: 2,
+                      priority: 2,
                     })
                   }
                   customStyles={{
                     optionWrapper: styles.menuOptionWrapper,
-                  }}
-                >
+                  }}>
                   <NoteText
                     style={{
                       color: colors.medium,
-                    }}
-                  >
-                    {t("medium")}
+                    }}>
+                    {t('medium')}
                   </NoteText>
                   <SimpleLineIcons name="graph" size={22} color={colors.medium} />
                 </MenuOption>
@@ -472,14 +471,13 @@ const Notes: FC<INotes> = ({ navigation }) => {
                   onSelect={() =>
                     setNote({
                       ...note,
-                      notePriority: 3,
+                      priority: 3,
                     })
                   }
                   customStyles={{
                     optionWrapper: styles.menuOptionWrapper,
-                  }}
-                >
-                  <NoteText style={{ color: colors.urgent }}>{t("urgent")}</NoteText>
+                  }}>
+                  <NoteText style={{color: colors.urgent}}>{t('urgent')}</NoteText>
                   <SimpleLineIcons name="graph" size={22} color={colors.urgent} />
                 </MenuOption>
               </MenuOptions>
@@ -489,8 +487,7 @@ const Notes: FC<INotes> = ({ navigation }) => {
               style={styles.sendButton}
               onPress={() => {
                 addNoteToChain();
-              }}
-            >
+              }}>
               <MaterialIcons name="arrow-upward" size={26} color="#fff" />
             </NoteButton>
           </View>
@@ -509,17 +506,18 @@ const styles = StyleSheet.create({
   },
   priorityTriggerButton: {
     borderWidth: 1,
-    borderColor: "#ddd",
-    flexDirection: "row",
+    borderColor: '#ddd',
+    flexDirection: 'row',
     gap: 6,
     borderRadius: 6,
     paddingHorizontal: 8,
     paddingVertical: 4,
-    alignItems: "center",
+    alignItems: 'center',
   },
   menuOptionsContainer: {
-    marginTop: Platform.OS === "ios" ? -180 : -130,
+    marginTop: Platform.OS === 'ios' ? -180 : -130,
     borderRadius: 6,
+    /*
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -527,26 +525,27 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.2,
     shadowRadius: 1.41,
+    */
     elevation: 2,
     zIndex: 2,
   },
   menuOptionWrapper: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 8,
   },
   bottomsheetInnerContainer: {
     flex: 1,
-    flexDirection: "column",
-    justifyContent: "space-between",
+    flexDirection: 'column',
+    justifyContent: 'space-between',
     paddingHorizontal: 12,
   },
   sheetModalBottom: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 6,
   },
   sendButton: {
@@ -558,19 +557,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     paddingVertical: 16,
     fontSize: 18,
-    fontFamily: "SourceCodePro-Regular",
+    fontFamily: 'SourceCodePro-Regular',
   },
   bottomSheetDescriptionInput: {
     paddingHorizontal: 4,
     paddingVertical: 16,
     fontSize: 18,
-    height: Platform.OS === "ios" ? 90 : "auto",
-    textAlignVertical: "top",
-    fontFamily: "SourceCodePro-Regular",
+    height: Platform.OS === 'ios' ? 90 : 'auto',
+    textAlignVertical: 'top',
+    fontFamily: 'SourceCodePro-Regular',
   },
   profileMain: {
-    flexDirection: "column",
-    alignItems: "flex-end",
+    flexDirection: 'column',
+    alignItems: 'flex-end',
   },
   connectedText: {
     fontSize: 15,

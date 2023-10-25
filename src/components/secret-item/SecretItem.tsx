@@ -1,7 +1,7 @@
-import { FC, PureComponent, useEffect } from "react";
-import { TouchableOpacity, TouchableOpacityProps, View, StyleSheet, Dimensions } from "react-native";
-import NoteText from "@components/text/NoteText";
-import { useTheme } from "@react-navigation/native";
+import {FC, useContext} from 'react';
+import {TouchableOpacity, TouchableOpacityProps, StyleSheet, Dimensions, View} from 'react-native';
+import NoteText from '@components/text/NoteText';
+import {useTheme} from '@react-navigation/native';
 import Animated, {
   useAnimatedGestureHandler,
   useSharedValue,
@@ -9,32 +9,52 @@ import Animated, {
   withSpring,
   withTiming,
   Easing,
-  ReduceMotion,
-  useAnimatedRef,
-  measure,
-  useDerivedValue,
   runOnJS,
-} from "react-native-reanimated";
-import { PanGestureHandler, PanGestureHandlerGestureEvent } from "react-native-gesture-handler";
-import Feather from "react-native-vector-icons/Feather";
+  useDerivedValue,
+  FadeIn,
+  FadeOut,
+  ZoomIn,
+  ZoomOut,
+} from 'react-native-reanimated';
+import {PanGestureHandler, PanGestureHandlerGestureEvent} from 'react-native-gesture-handler';
+import Feather from 'react-native-vector-icons/Feather';
+import moment from 'moment';
+import {getNotePriorityColor, priorityPrettier} from '@helpers/priority-control';
+import {ThemeContext} from '@contexts/Theme';
 
-interface ISecretItem {
+interface ISecretItem extends TouchableOpacityProps {
   id: string;
   title: string;
   content: string;
-  date: string;
   priority: number;
+  createdAt: number;
+  updatedAt: number;
   style?: any;
   onDelete?: (id: string) => void;
   simultaneousHandler?: any;
   panRef?: any;
 }
 
-const ScreenWidth = Dimensions.get("window").width;
+const ScreenWidth = Dimensions.get('window').width;
 const TranslateXThreshold = -ScreenWidth * 0.4; // 40% of the screen width
 
-const SecretItem: FC<ISecretItem> = ({ id, title, content, date, style, panRef, simultaneousHandler, onDelete = () => {}, ...props }) => {
-  const { colors } = useTheme();
+const AnimatedButton = Animated.createAnimatedComponent(TouchableOpacity);
+
+const SecretItem: FC<ISecretItem> = ({
+  id,
+  title,
+  content,
+  createdAt,
+  updatedAt,
+  priority,
+  style,
+  panRef,
+  simultaneousHandler,
+  onDelete = () => {},
+  ...props
+}) => {
+  const {colors} = useTheme();
+  const {themeValue} = useContext(ThemeContext);
 
   const translateX = useSharedValue(0);
   const itemHeight = useSharedValue(undefined);
@@ -42,78 +62,52 @@ const SecretItem: FC<ISecretItem> = ({ id, title, content, date, style, panRef, 
   const containerOpacity = useSharedValue(1);
 
   const panGesture = useAnimatedGestureHandler<PanGestureHandlerGestureEvent>({
-    onActive: (event) => {
+    onActive: event => {
       translateX.value = event.translationX;
     },
     onEnd: () => {
       const shouldBeDismissed = translateX.value < TranslateXThreshold; // ekranın %40 undan fazla bir kaydırma varsa öğeyi sil
       if (shouldBeDismissed) {
-        (translateX.value = -ScreenWidth),
-          {
-            duration: 200,
-            easing: Easing.linear,
-          };
-
+        translateX.value = withTiming(-ScreenWidth);
         // @ts-ignore
-        itemHeight.value = 0;
-        marginVertical.value = 0;
-        containerOpacity.value = withTiming(
-          0,
-          {
-            duration: 200,
-            easing: Easing.linear,
-          },
-          (isFinished) => {
-            if (isFinished && onDelete) runOnJS(onDelete)(id);
-          }
-        );
+        itemHeight.value = withTiming(0);
+        marginVertical.value = withTiming(0);
+        containerOpacity.value = withTiming(0, undefined, isFinished => {
+          if (isFinished && onDelete) runOnJS(onDelete)(id);
+        });
       } else {
-        translateX.value = 0;
+        translateX.value = withTiming(0);
       }
     },
   });
 
   const animatedContainerStyle = useAnimatedStyle(() => ({
     // @ts-ignore
-    height: withTiming(itemHeight.value, {
-      duration: 200,
-      easing: Easing.out(Easing.exp),
-    }),
-    marginVertical: withTiming(marginVertical.value, {
-      duration: 200,
-      easing: Easing.out(Easing.exp),
-    }),
-    opacity: withTiming(containerOpacity.value, {
-      duration: 200,
-      easing: Easing.out(Easing.exp),
-    }),
+    height: itemHeight.value,
+    marginVertical: marginVertical.value,
+    opacity: containerOpacity.value,
   }));
 
   const animatedItemStyles = useAnimatedStyle(() => ({
     transform: [
       {
-        translateX: withSpring(translateX.value, {
-          mass: 1,
-          stiffness: 120,
-          damping: 10,
-        }),
+        translateX: translateX.value,
       },
     ],
   }));
 
   const animatedIconContainerStyles = useAnimatedStyle(() => ({
-    opacity: withTiming(translateX.value < TranslateXThreshold + 80 ? 1 : 0, {
-      duration: 140,
-      easing: Easing.linear,
-    }),
-    width: withTiming(translateX.value < TranslateXThreshold + 80 ? 60 : 0, {
-      duration: 240,
-      easing: Easing.linear,
-    }),
+    opacity: withTiming(translateX.value < TranslateXThreshold + 80 ? 1 : 0),
+    width: withTiming(translateX.value < TranslateXThreshold + 80 ? 60 : 0),
   }));
 
   return (
-    <Animated.View style={[styles.container, style, animatedContainerStyle]} {...props}>
+    <AnimatedButton
+      style={[styles.container, style, animatedContainerStyle]}
+      entering={ZoomIn}
+      exiting={ZoomOut}
+      {...props}
+      activeOpacity={0.7}>
       <PanGestureHandler onGestureEvent={panGesture} ref={panRef} simultaneousHandlers={simultaneousHandler}>
         <Animated.View
           style={[
@@ -122,13 +116,23 @@ const SecretItem: FC<ISecretItem> = ({ id, title, content, date, style, panRef, 
               backgroundColor: colors.noteItem,
             },
             animatedItemStyles,
-          ]}
-        >
+          ]}>
           <NoteText style={styles.titleText} weight="700">
             {title}
           </NoteText>
           <NoteText style={styles.contentText}>{content}</NoteText>
-          <NoteText style={styles.dateText}>{date}</NoteText>
+          <View style={styles.itemBottom}>
+            <View style={styles.itemTimeContainer}>
+              <NoteText style={styles.dateText}>{moment.unix(createdAt).format('HH:mm')}</NoteText>
+              <NoteText style={styles.dateText}>{moment.unix(createdAt).format('DD MMMM YYYY')}</NoteText>
+            </View>
+
+            <NoteText
+              style={[styles.priorityText, {color: getNotePriorityColor(themeValue, colors, priority)}]}
+              weight="700">
+              {priorityPrettier(priority)}
+            </NoteText>
+          </View>
         </Animated.View>
       </PanGestureHandler>
       <Animated.View
@@ -138,11 +142,10 @@ const SecretItem: FC<ISecretItem> = ({ id, title, content, date, style, panRef, 
             backgroundColor: colors.trashBg,
           },
           animatedIconContainerStyles,
-        ]}
-      >
+        ]}>
         <Feather name="trash" size={24} color="#fff" />
       </Animated.View>
-    </Animated.View>
+    </AnimatedButton>
   );
 };
 
@@ -154,29 +157,40 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   titleText: {
-    color: "black",
+    color: 'black',
     fontSize: 18,
-    fontWeight: "700",
+    fontWeight: '700',
   },
   contentText: {
     marginTop: 2,
     marginBottom: 8,
     fontSize: 14,
-    color: "gray",
+    color: 'gray',
   },
   dateText: {
-    fontSize: 12,
+    fontSize: 11,
   },
   iconContainer: {
-    height: "100%",
+    height: '100%',
     width: 60,
-    position: "absolute",
-    right: "5%",
-    justifyContent: "center",
-    alignItems: "center",
+    position: 'absolute',
+    right: '5%',
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 5,
     zIndex: -10,
     elevation: -10,
+  },
+  itemBottom: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  itemTimeContainer: {
+    flexDirection: 'column',
+  },
+  priorityText: {
+    fontSize: 13,
   },
 });
 
