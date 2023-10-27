@@ -52,7 +52,7 @@ export default Indicator;
 const styles = StyleSheet.create({
   indicatorContainer: {
     position: 'absolute',
-    bottom: 100,
+    bottom: 60,
     flexDirection: 'row',
     alignSelf: 'center',
     width: '100%',

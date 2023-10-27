@@ -51,7 +51,9 @@ const Onboarding = () => {
                 />
               </View>
               <View style={styles.flatListItemTextContainer}>
-                <NoteText style={styles.itemTitle}>{t(item.title)}</NoteText>
+                <NoteText style={styles.itemTitle} weight="700">
+                  {t(item.title)}
+                </NoteText>
                 <NoteText style={styles.itemDescription}>{t(item.description)}</NoteText>
               </View>
             </View>
@@ -100,10 +102,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   flatListItemTextContainer: {
-    flex: 0.5,
+    flex: 0.35,
   },
   itemTitle: {
-    fontSize: 28,
+    fontSize: 26,
     paddingTop: 18,
     color: '#fff',
     elevation: 100,
@@ -113,7 +115,7 @@ const styles = StyleSheet.create({
   },
   itemDescription: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 15,
   },
 });
 

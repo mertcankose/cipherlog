@@ -1,6 +1,7 @@
 package com.notedapp;
 
 import android.os.Bundle;
+import org.devio.rn.splashscreen.SplashScreen;
 
 import expo.modules.ReactActivityDelegateWrapper;
 
@@ -36,6 +37,7 @@ public class MainActivity extends ReactActivity {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(null);
+    SplashScreen.show(this);
+    super.onCreate(savedInstanceState);
   }
 }
