@@ -1,6 +1,6 @@
-import "@react-navigation/native";
+import '@react-navigation/native';
 
-declare module "@react-navigation/native" {
+declare module '@react-navigation/native' {
   export type ExtendedTheme = {
     dark: boolean;
     colors: {
@@ -18,6 +18,7 @@ declare module "@react-navigation/native" {
       inputPlaceholder: string;
       trashBg: string;
       noteItem: string;
+      paginationDisabled: string;
     };
   };
   export function useTheme(): ExtendedTheme;

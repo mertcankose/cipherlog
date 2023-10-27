@@ -1,8 +1,19 @@
 import {Header, NetworkModal, SecretItem, NoteButton, NoteText} from '@components';
 import {useContext, FC, useRef, useMemo, useCallback, useEffect, useState} from 'react';
-import {FlatList, View, StyleSheet, Platform, TouchableOpacity, RefreshControl, TextInput, Keyboard, ActivityIndicator} from 'react-native';
+import {
+  FlatList,
+  View,
+  StyleSheet,
+  Platform,
+  TouchableOpacity,
+  RefreshControl,
+  TextInput,
+  Keyboard,
+  ActivityIndicator,
+} from 'react-native';
 import Octicons from 'react-native-vector-icons/Octicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import BottomSheet, {BottomSheetTextInput, BottomSheetBackdrop} from '@gorhom/bottom-sheet';
 import {Menu, MenuOptions, MenuOption, MenuTrigger} from 'react-native-popup-menu';
@@ -18,6 +29,7 @@ import {WalletContext} from '@contexts/Wallet';
 import {ethers} from 'ethers';
 import {toastMessage} from '@utils/toast';
 import {getNotePriorityColor} from '@helpers/priority-control';
+import {parseAndFormat} from '@helpers/bignumber-prettier';
 
 interface INotes {
   navigation: any;
@@ -47,13 +59,16 @@ const Notes: FC<INotes> = ({navigation}) => {
     userAddress,
     contractAddress,
     // pagination
-    page,
-    setPage,
+    currentPage,
+    setCurrentPage,
     resultsPerPage,
-    setResultsPerPage,
     // contract
     isLoadingContract,
     errorContract,
+    // user notes size
+    userNotesSize,
+    isLoadingUserNotesSize,
+    errorUserNotesSize,
     // user notes
     userNotes,
     isLoadingUserNotes,
@@ -71,8 +86,27 @@ const Notes: FC<INotes> = ({navigation}) => {
     deleteNote,
     isLoadingDeleteNote,
     errorDeleteNote,
+    isSuccessDeleteNote,
   } = useContext(WalletContext);
   const [networkModalVisible, setNetworkModalVisible] = useState<boolean>(false);
+
+  const totalResults = parseAndFormat(userNotesSize);
+  const totalPages = Math.ceil(totalResults / resultsPerPage);
+
+  const isLastPage = currentPage === totalPages;
+  const isFirstPage = currentPage === 1;
+
+  const handleNextPage = () => {
+    if (!isLastPage) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (!isFirstPage) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
 
   /* THEME AND LANG */
   const {activeTheme, themeValue, changeTheme} = useContext(ThemeContext);
@@ -86,14 +120,14 @@ const Notes: FC<INotes> = ({navigation}) => {
   const [isBottomSheetVisible, setIsBottomSheetVisible] = useState<boolean>(false);
   const textInputRef = useRef<TextInput>(null);
 
+  // initialize the user notes from contract
   useEffect(() => {
     if (userNotes) {
-      const transformedData = transformData(userNotes);
-      console.log('usernotes: ', transformedData);
-      setNotes(transformedData);
+      getNotesFromBlockchain();
     }
   }, [userNotes]);
 
+  // if setting note is success, close the bottom sheet and reset the note
   useEffect(() => {
     if (isSuccessMutateNote) {
       bottomSheetRef.current?.close();
@@ -108,6 +142,7 @@ const Notes: FC<INotes> = ({navigation}) => {
     }
   }, [isSuccessMutateNote]);
 
+  // control the bottom sheet visibility, if it is visible, focus the text input and if it is not visible, dismiss the keyboard
   useEffect(() => {
     if (!isBottomSheetVisible) {
       Keyboard.dismiss();
@@ -116,6 +151,7 @@ const Notes: FC<INotes> = ({navigation}) => {
     }
   }, [isBottomSheetVisible]);
 
+  // control keyboard visibility, if it is not visible, close the bottom sheet
   useEffect(() => {
     if (!isKeyboardVisible) {
       bottomSheetRef.current?.close();
@@ -131,6 +167,7 @@ const Notes: FC<INotes> = ({navigation}) => {
     setIsBottomSheetVisible(!isBottomSheetVisible);
   }, [isBottomSheetVisible]);
 
+  // control bottom sheet changes
   const handleSheetChanges = useCallback((index: number) => {
     console.log('handleSheetChanges', index); // 0, -1
     if (index == -1) {
@@ -140,7 +177,10 @@ const Notes: FC<INotes> = ({navigation}) => {
     }
   }, []);
 
-  const renderBackdrop = useCallback(props => <BottomSheetBackdrop appearsOnIndex={1} disappearsOnIndex={-1} opacity={0.1} {...props} />, []);
+  const renderBackdrop = useCallback(
+    props => <BottomSheetBackdrop appearsOnIndex={1} disappearsOnIndex={-1} opacity={0.1} {...props} />,
+    [],
+  );
 
   /* APP SPESIFIC METHODS */
   const openSidebar = () => {
@@ -156,38 +196,36 @@ const Notes: FC<INotes> = ({navigation}) => {
     return 10;
   };
 
+  const getNotesFromBlockchain = () => {
+    const transformedData = transformData(userNotes);
+    console.log('usernotes: ', transformedData);
+    setNotes(transformedData);
+  };
+
   const onRefreshNotes = useCallback(() => {
     setRefreshingNotes(true);
+    getNotesFromBlockchain();
+    setRefreshingNotes(false);
 
-    setTimeout(() => {
-      setRefreshingNotes(false);
-    }, 1000);
+    // setTimeout(() => {
+    //   setRefreshingNotes(false);
+    // }, 1000);
   }, []);
 
   const getNotePriorityName = () => {
-    return note.priority === 0 ? t('priority') : note.priority === 1 ? t('normal') : note.priority === 2 ? t('medium') : t('urgent');
-  };
-
-  /*
-  const getNotePriorityColor = () => {
     return note.priority === 0
-      ? themeValue === 'light'
-        ? colors.none
-        : '#fff'
+      ? t('priority')
       : note.priority === 1
-      ? colors.normal
+      ? t('normal')
       : note.priority === 2
-      ? colors.medium
-      : colors.urgent;
+      ? t('medium')
+      : t('urgent');
   };
-  */
 
   const transformData = inputData => {
     return inputData
       .filter(([id, title, content, priority, createdAt, updatedAt]) => title.length > 0)
       .map(([id, title, content, priority, createdAt, updatedAt]) => {
-        const parseAndFormat = value => ethers.utils.formatUnits(JSON.parse(value), 0);
-
         return {
           id: parseAndFormat(id),
           title,
@@ -212,10 +250,28 @@ const Notes: FC<INotes> = ({navigation}) => {
     }
   };
 
-  const removeNote = (id: string) => {
-    // console.log("removeNote", id);
-    setNotes(notes.filter(note => note.id !== id));
+  const removeNote = async (id: string) => {
+    console.log('deleteNote', id);
+    // setNotes(notes.filter(note => note.id !== id));
+    try {
+      let result = await deleteNote({args: [id]});
+    } catch (error) {
+      toastMessage('error', 'Error', 'There is a problem to delete note');
+    }
   };
+
+  useEffect(() => {
+    if (errorDeleteNote) {
+      toastMessage('error', 'Error', 'There is a problem to delete note');
+    }
+  }, [errorDeleteNote]);
+
+  useEffect(() => {
+    if (isSuccessDeleteNote) {
+      toastMessage('success', 'Success', 'Note is deleted successfully');
+      getNotesFromBlockchain();
+    }
+  }, [isSuccessDeleteNote]);
 
   return (
     <View
@@ -286,7 +342,7 @@ const Notes: FC<INotes> = ({navigation}) => {
         Get Notes
       </Web3Button> */}
 
-      <View style={{flex: 1}}>
+      <View style={{borderWidth: 0}}>
         <NativeViewGestureHandler ref={flashlistRef} simultaneousHandlers={panRef}>
           <FlatList
             data={notes}
@@ -322,26 +378,50 @@ const Notes: FC<INotes> = ({navigation}) => {
               />
             )}
             extraData={selectedNoteId}
-            refreshControl={<RefreshControl refreshing={refreshingNotes} onRefresh={onRefreshNotes} colors={[colors.primary]} tintColor={colors.primary} />}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshingNotes}
+                onRefresh={onRefreshNotes}
+                colors={[colors.primary]}
+                tintColor={colors.primary}
+              />
+            }
             refreshing={refreshingNotes}
             // estimatedItemSize={4}
           />
         </NativeViewGestureHandler>
+        <View style={styles.paginationContainer}>
+          <NoteButton
+            onPress={handlePrevPage}
+            style={[
+              styles.paginationButton,
+              {
+                backgroundColor: isFirstPage ? colors.paginationDisabled : colors.primary,
+              },
+            ]}
+            disabled={isFirstPage}>
+            <AntDesign name="left" size={18} color="#fff" />
+          </NoteButton>
+
+          <NoteText style={[styles.paginationText, {color: colors.text}]} weight="600">
+            {`${currentPage}/${totalPages}`}
+          </NoteText>
+
+          <NoteButton
+            onPress={handleNextPage}
+            style={[
+              styles.paginationButton,
+              {
+                backgroundColor: isLastPage ? colors.paginationDisabled : colors.primary,
+              },
+            ]}
+            disabled={isLastPage}>
+            <AntDesign name="right" size={18} color="#fff" />
+          </NoteButton>
+        </View>
       </View>
 
-      <NoteButton
-        onPress={handleSheetPress}
-        style={{
-          position: 'absolute',
-          bottom: 48,
-          right: 32,
-          borderWidth: 0,
-          width: 56,
-          height: 56,
-          borderRadius: 28,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
+      <NoteButton onPress={handleSheetPress} style={styles.plusButton}>
         <Octicons name="plus" size={26} color="#fff" />
       </NoteButton>
 
@@ -576,5 +656,34 @@ const styles = StyleSheet.create({
   },
   notConnectedText: {
     fontSize: 15,
+  },
+  paginationContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    paddingLeft: 16,
+    alignItems: 'center',
+    marginTop: 12,
+  },
+  paginationText: {
+    marginHorizontal: 16,
+    fontSize: 18,
+  },
+  paginationButton: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 34,
+    height: 34,
+    borderRadius: 999,
+  },
+  plusButton: {
+    position: 'absolute',
+    bottom: 48,
+    right: 32,
+    borderWidth: 0,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
