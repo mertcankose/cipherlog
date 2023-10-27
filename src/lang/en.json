@@ -27,6 +27,12 @@
       "notSupportNetwork":"Network Not Supported!",
       "selectNetwork":"Select Network",
       "notConnected":"Not Connected",
-      "invalidNetwork":"Invalid Network"
+      "invalidNetwork":"Invalid Network",
+      "onboardingTitle1": "Hello New World!",
+      "onboardingDescription1": "Connect your crypto wallet and securely store your notes. We're here for a quick and easy start!",
+      "onboardingTitle2": "Safely Keep Your Notes",
+      "onboardingDescription2": "Save your thoughts without worry. Secure your notes with blockchain technology.",
+      "onboardingTitle3": "Personalized Notes",
+      "onboardingDescription3": "Choose colors, organize notes, and experience the note-taking journey you've imagined. Your notes, your style!"
     }
   }

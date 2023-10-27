@@ -34,5 +34,7 @@ interface IChainId {
 
 declare module '@env' {
   export const THIRD_WEB_PROJECT_ID: string;
-  export const CONTRACT_ADDRESS: string;
+  export const CONTRACT_ADDRESS_GOERLI: string;
+  export const CONTRACT_ADDRESS_BSC_TESTNET: string;
+  export const WALLET_CONNECT_PROJECT_ID: string;
 }

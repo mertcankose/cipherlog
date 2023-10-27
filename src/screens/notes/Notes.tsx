@@ -1,4 +1,4 @@
-import {Header, NetworkModal, SecretItem, NoteButton, NoteText} from '@components';
+import {Header, SecretItem, NoteButton, NoteText} from '@components';
 import {useContext, FC, useRef, useMemo, useCallback, useEffect, useState} from 'react';
 import {
   FlatList,
@@ -23,7 +23,7 @@ import {ThemeContext} from '@contexts/Theme';
 import {useTranslation} from 'react-i18next';
 import {useTheme} from '@react-navigation/native';
 import useKeyboardVisibility from '@hooks/useKeyboardVisibility';
-import {Web3Button} from '@thirdweb-dev/react-native';
+import {ConnectWallet, Web3Button} from '@thirdweb-dev/react-native';
 import {NativeViewGestureHandler} from 'react-native-gesture-handler';
 import {WalletContext} from '@contexts/Wallet';
 import {ethers} from 'ethers';
@@ -88,7 +88,6 @@ const Notes: FC<INotes> = ({navigation}) => {
     errorDeleteNote,
     isSuccessDeleteNote,
   } = useContext(WalletContext);
-  const [networkModalVisible, setNetworkModalVisible] = useState<boolean>(false);
 
   const totalResults = parseAndFormat(userNotesSize);
   const totalPages = Math.ceil(totalResults / resultsPerPage);
@@ -317,30 +316,30 @@ const Notes: FC<INotes> = ({navigation}) => {
           </TouchableOpacity>
         }
       />
-      <NetworkModal
-        visibility={networkModalVisible}
-        closeModal={() => {
-          setNetworkModalVisible(false);
-        }}
-        selectNetwork={(network: IApplicableNetwork) => {
-          setNetworkModalVisible(false);
-        }}
-      />
 
       {isLoadingMutateNote && <ActivityIndicator size="large" color={colors.primary} style={{marginTop: 10}} />}
 
-      {/* <Web3Button contractAddress={contractAddress} action={() => mutateNote({args: ['Hello', 'Hii', 2]})}>
-        Send Transaction
-      </Web3Button>
+      {!userAddress && (
+        <NoteButton
+          style={{
+            backgroundColor: 'transparent',
+            paddingTop: 8,
+          }}
+          onPress={openSidebar}>
+          <NoteText>Henüz bağlı değilsiniz!</NoteText>
+        </NoteButton>
+      )}
 
-      <Web3Button
-        contractAddress={contractAddress}
-        action={async () => {
-          let result = await mutateUserAllNotes({args: []});
-          console.log('result: ', result);
-        }}>
-        Get Notes
-      </Web3Button> */}
+      {userAddress && notes.length == 0 && (
+        <NoteButton
+          style={{
+            backgroundColor: 'transparent',
+            paddingTop: 12,
+          }}
+          onPress={handleSheetPress}>
+          <NoteText>Bir şeyler yaz...</NoteText>
+        </NoteButton>
+      )}
 
       <View style={{borderWidth: 0}}>
         <NativeViewGestureHandler ref={flashlistRef} simultaneousHandlers={panRef}>
@@ -390,35 +389,37 @@ const Notes: FC<INotes> = ({navigation}) => {
             // estimatedItemSize={4}
           />
         </NativeViewGestureHandler>
-        <View style={styles.paginationContainer}>
-          <NoteButton
-            onPress={handlePrevPage}
-            style={[
-              styles.paginationButton,
-              {
-                backgroundColor: isFirstPage ? colors.paginationDisabled : colors.primary,
-              },
-            ]}
-            disabled={isFirstPage}>
-            <AntDesign name="left" size={18} color="#fff" />
-          </NoteButton>
+        {notes.length > 0 && (
+          <View style={styles.paginationContainer}>
+            <NoteButton
+              onPress={handlePrevPage}
+              style={[
+                styles.paginationButton,
+                {
+                  backgroundColor: isFirstPage ? colors.paginationDisabled : colors.primary,
+                },
+              ]}
+              disabled={isFirstPage}>
+              <AntDesign name="left" size={18} color="#fff" />
+            </NoteButton>
 
-          <NoteText style={[styles.paginationText, {color: colors.text}]} weight="600">
-            {`${currentPage}/${totalPages}`}
-          </NoteText>
+            <NoteText style={[styles.paginationText, {color: colors.text}]} weight="600">
+              {`${currentPage}/${totalPages}`}
+            </NoteText>
 
-          <NoteButton
-            onPress={handleNextPage}
-            style={[
-              styles.paginationButton,
-              {
-                backgroundColor: isLastPage ? colors.paginationDisabled : colors.primary,
-              },
-            ]}
-            disabled={isLastPage}>
-            <AntDesign name="right" size={18} color="#fff" />
-          </NoteButton>
-        </View>
+            <NoteButton
+              onPress={handleNextPage}
+              style={[
+                styles.paginationButton,
+                {
+                  backgroundColor: isLastPage ? colors.paginationDisabled : colors.primary,
+                },
+              ]}
+              disabled={isLastPage}>
+              <AntDesign name="right" size={18} color="#fff" />
+            </NoteButton>
+          </View>
+        )}
       </View>
 
       <NoteButton onPress={handleSheetPress} style={styles.plusButton}>

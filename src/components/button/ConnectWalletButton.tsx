@@ -1,60 +1,26 @@
-import React, { FC, useContext } from "react";
-import { TouchableOpacity, TouchableOpacityProps, StyleSheet } from "react-native";
-import NoteText from "@components/text/NoteText";
-import { WalletContext } from "@contexts/Wallet";
-import { useTranslation } from "react-i18next";
+import {FC, useContext} from 'react';
+import {TouchableOpacity, TouchableOpacityProps, StyleSheet, View} from 'react-native';
+import NoteText from '@components/text/NoteText';
+import {WalletContext} from '@contexts/Wallet';
+import {useTranslation} from 'react-i18next';
+import {ConnectWallet} from '@thirdweb-dev/react-native';
 
-interface IConnectWalletButtonProps extends TouchableOpacityProps {
+interface IConnectWalletButtonProps {
   style?: any;
 }
 
-const ConnectWalletButton: FC<IConnectWalletButtonProps> = ({ style, ...props }) => {
-  const { t } = useTranslation();
-
-  const handlePress = () => {
-    // if (isConnected) {
-    //   disconnectWallet();
-    //   return;
-    // }
-    // connectWallet();
-  };
+const ConnectWalletButton: FC<IConnectWalletButtonProps> = ({style, ...props}) => {
+  const {t} = useTranslation();
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.8}
-      onPress={handlePress}
-      style={[
-        styles.button,
-        // isConnected ? styles.disconnectedButton : styles.connectedButton,
-        style,
-      ]}
-      {...props}
-    >
-      <NoteText style={styles.text} weight="600">
-        {/* {isConnected ? t('disconnectwallet') : t('connectwallet')} */}
-      </NoteText>
-    </TouchableOpacity>
+    <View style={[styles.connectWalletContainer, style]} {...props}>
+      <ConnectWallet switchToActiveChain={false} buttonTitle="Connect Wallet" />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  button: {
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    borderRadius: 8,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  connectedButton: {
-    backgroundColor: "primary", // Replace 'primary' with your actual primary color
-  },
-  disconnectedButton: {
-    backgroundColor: "red",
-  },
-  text: {
-    color: "white",
-    fontSize: 16,
-  },
+  connectWalletContainer: {},
 });
 
 export default ConnectWalletButton;

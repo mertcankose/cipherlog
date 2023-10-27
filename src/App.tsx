@@ -3,42 +3,45 @@ import '@ethersproject/shims';
 import 'react-native-gesture-handler';
 import '@utils/i18n'; // multi-language
 import '@walletconnect/react-native-compat'; // for wallet errors
-import {ConnectWallet, localWallet, metamaskWallet, rainbowWallet, ThirdwebProvider, coinbaseWallet, trustWallet} from '@thirdweb-dev/react-native';
-import {Ethereum, Goerli, Sepolia, Binance, BinanceTestnet} from '@thirdweb-dev/chains';
-
-import {WalletProvider, TodoProvider, ThemeProvider, LangProvider} from '@contexts';
-
-import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
-import {NoteStatusBar} from '@components';
-import Navigation from '@navigation';
+import {useCallback, useContext} from 'react';
+import {metamaskWallet, ThirdwebProvider, walletConnect} from '@thirdweb-dev/react-native';
+import {Ethereum} from '@thirdweb-dev/chains';
+import {WalletProvider, GeneralProvider, ThemeProvider, LangProvider} from '@contexts';
 import {MenuProvider} from 'react-native-popup-menu';
-import {THIRD_WEB_PROJECT_ID} from '@env';
+import {THIRD_WEB_PROJECT_ID, WALLET_CONNECT_PROJECT_ID} from '@env';
+import AppInside from '@navigation/AppInside';
 
+/*
+rainbow -> only ethereum network
+coinbase -> error
+trust wallet -> waiting not error
+*/
 const App = () => {
-  console.log('env: ', THIRD_WEB_PROJECT_ID);
+  const activeChain = Ethereum;
+
   return (
     <ThirdwebProvider
-      activeChain="goerli"
+      activeChain={activeChain}
       clientId={THIRD_WEB_PROJECT_ID}
-      supportedChains={[Ethereum, Goerli, Sepolia, Binance, BinanceTestnet]}
-      supportedWallets={[metamaskWallet(), rainbowWallet(), coinbaseWallet(), trustWallet(), localWallet()]}>
-      <WalletProvider>
-        <ThemeProvider>
-          <LangProvider>
-            <TodoProvider>
+      supportedChains={[Ethereum]}
+      supportedWallets={[
+        metamaskWallet({
+          projectId: WALLET_CONNECT_PROJECT_ID,
+          recommended: true,
+        }),
+        walletConnect(),
+      ]}>
+      <GeneralProvider>
+        <WalletProvider>
+          <ThemeProvider>
+            <LangProvider>
               <MenuProvider>
-                <SafeAreaProvider>
-                  <NoteStatusBar />
-                  <Navigation />
-
-                  <Toast />
-                </SafeAreaProvider>
+                <AppInside />
               </MenuProvider>
-            </TodoProvider>
-          </LangProvider>
-        </ThemeProvider>
-      </WalletProvider>
+            </LangProvider>
+          </ThemeProvider>
+        </WalletProvider>
+      </GeneralProvider>
     </ThirdwebProvider>
   );
 };

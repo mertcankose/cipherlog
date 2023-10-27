@@ -27,6 +27,12 @@
       "notSupportNetwork":"Bu ağ desteklenmiyor!",
       "selectNetwork":"Ağ Seçiniz",
       "notConnected":"Bağlı Değil",
-      "invalidNetwork":"Geçersiz Ağ"
+      "invalidNetwork":"Geçersiz Ağ",
+      "onboardingTitle1":"Merhaba Yeni Dünya!",
+      "onboardingDescription1":"Kripto cüzdanını bağla ve notlarını güvenle sakla. Hızlı ve kolay bir başlangıç için buradayız!",
+      "onboardingTitle2":"Notlarını Güvenle Sakla",
+      "onboardingDescription2":"Endişelenmeden düşüncelerini kaydet. Blockchain teknolojisi ile notlarınızı güven altına alın.",
+      "onboardingTitle3":"Kişiselleştirilmiş Notlar",
+      "onboardingDescription3":"Renkleri seç, notları düzenle, hayal ettiğin gibi bir not deneyimi yaşa. Senin notların, senin tarzın!"
   }
 }

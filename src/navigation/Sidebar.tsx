@@ -1,22 +1,17 @@
-import { Fallback, ProfileSidebar, NoteText } from "@components";
+import {FC, useContext} from 'react';
+import {NoteText, WalletProfile} from '@components';
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
   DrawerItemList,
-  DrawerItem,
   DrawerContentComponentProps,
-} from "@react-navigation/drawer";
-
-import { DrawerActions, useNavigation } from "@react-navigation/native";
-import { AboutStack, NotesStack, AccountStack, SettingsStack } from "@stacks";
-import { FC, useContext, useEffect } from "react";
-import { Platform, Text, TouchableOpacity, View, StyleSheet } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
-import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
-import { navigationPush } from "./RootNavigation";
-import { WalletContext } from "@contexts/Wallet";
-import { useTranslation } from "react-i18next";
-import { useTheme } from "@react-navigation/native";
+} from '@react-navigation/drawer';
+import {NotesStack, AccountStack} from '@stacks';
+import {View, StyleSheet} from 'react-native';
+import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
+import {useTranslation} from 'react-i18next';
+import {useTheme} from '@react-navigation/native';
+import {WalletContext} from '@contexts/Wallet';
 
 const Drawer = createDrawerNavigator();
 
@@ -24,13 +19,11 @@ interface CustomDrawerContentProps extends DrawerContentComponentProps {
   props?: any;
 }
 
-const CustomDrawer: FC<CustomDrawerContentProps> = (props) => {
-  //   const insets = useSafeAreaInsets();
-  // const {colorScheme} = useColorScheme();
+const CustomDrawer: FC<CustomDrawerContentProps> = props => {
+  const {colors} = useTheme();
+  const {t} = useTranslation();
 
-  const { colors } = useTheme();
-
-  const { t } = useTranslation();
+  const {userAddress} = useContext(WalletContext);
 
   return (
     <View
@@ -39,28 +32,25 @@ const CustomDrawer: FC<CustomDrawerContentProps> = (props) => {
         {
           backgroundColor: colors.background,
         },
-      ]}
-    >
-      <Fallback
+      ]}>
+      <WalletProfile
         style={{
-          paddingHorizontal: 20,
-          paddingVertical: 30,
-          borderBottomWidth: 1,
-          borderBottomColor: "#F1EFEF",
+          paddingVertical: 20,
+          paddingHorizontal: 16,
         }}
-      >
-        <ProfileSidebar navigation={props.navigation} />
-      </Fallback>
+        style2={{
+          flex: 1,
+        }}
+      />
       <DrawerContentScrollView
         {...props}
         contentContainerStyle={{
           paddingTop: 8,
           paddingBottom: 8,
-          flexDirection: "column",
+          flexDirection: 'column',
           gap: 6,
           flex: 1,
-        }}
-      >
+        }}>
         <DrawerItemList {...props} />
       </DrawerContentScrollView>
     </View>
@@ -68,9 +58,8 @@ const CustomDrawer: FC<CustomDrawerContentProps> = (props) => {
 };
 
 const Sidebar: FC = () => {
-  // const {colorScheme} = useColorScheme();
-  const { t } = useTranslation();
-  const { colors } = useTheme();
+  const {t} = useTranslation();
+  const {colors} = useTheme();
 
   return (
     <Drawer.Navigator
@@ -80,11 +69,11 @@ const Sidebar: FC = () => {
           width: 270,
         },
         headerShown: false,
-        drawerActiveBackgroundColor: "#F1EFEF",
-        drawerActiveTintColor: "#279EFF",
+        drawerActiveBackgroundColor: '#F1EFEF',
+        drawerActiveTintColor: '#279EFF',
         drawerInactiveTintColor: colors.pale,
         drawerLabelStyle: {
-          fontFamily: "Source Code Pro",
+          fontFamily: 'Source Code Pro',
           fontSize: 18,
           marginLeft: -20,
         },
@@ -92,55 +81,41 @@ const Sidebar: FC = () => {
           paddingLeft: 6,
         },
       }}
-      drawerContent={(props) => <CustomDrawer {...props} />}
-    >
+      drawerContent={props => <CustomDrawer {...props} />}>
       <Drawer.Screen
         name="NotesStack"
         component={NotesStack}
         options={{
-          title: "Notes",
-          drawerLabel: ({ color }) => (
+          title: 'Notes',
+          drawerLabel: ({color}) => (
             <NoteText
               style={{
                 fontSize: 20,
                 marginLeft: -20,
                 color: color,
-              }}
-            >
-              {t("notes")}
+              }}>
+              {t('notes')}
             </NoteText>
           ),
-          drawerIcon: ({ color }) => <SimpleLineIcons name="note" size={20} color={color} />,
+          drawerIcon: ({color}) => <SimpleLineIcons name="note" size={20} color={color} />,
         }}
       />
       <Drawer.Screen
         name="AccountStack"
         component={AccountStack}
         options={{
-          title: "Account",
-          drawerLabel: ({ color }) => (
+          title: 'Account',
+          drawerLabel: ({color}) => (
             <NoteText
               style={{
                 fontSize: 20,
                 marginLeft: -20,
                 color: color,
-              }}
-            >
-              {t("account")}
+              }}>
+              {t('account')}
             </NoteText>
           ),
-          drawerIcon: ({ color }) => <SimpleLineIcons name="ghost" size={20} color={color} />,
-        }}
-      />
-      <Drawer.Screen
-        name="SettingsStack"
-        component={SettingsStack}
-        options={{
-          title: "Settings",
-          drawerLabel: "Settings",
-          drawerItemStyle: {
-            display: "none",
-          },
+          drawerIcon: ({color}) => <SimpleLineIcons name="ghost" size={20} color={color} />,
         }}
       />
     </Drawer.Navigator>
@@ -154,14 +129,3 @@ const styles = StyleSheet.create({
 });
 
 export default Sidebar;
-
-/*        
-headerLeft: () => (
-    <TouchableOpacity
-        style={{}}
-        onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}>
-            <Text>m</Text>
-            <Menu width={22} height={22} color="black" />
-    </TouchableOpacity>
-    ),
-*/

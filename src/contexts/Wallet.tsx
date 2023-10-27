@@ -1,6 +1,6 @@
 import {FC, ReactNode, useState, createContext, useEffect} from 'react';
 import {useContract, useContractRead, useContractWrite, useAddress} from '@thirdweb-dev/react-native';
-import {CONTRACT_ADDRESS} from '@env';
+import {CONTRACT_ADDRESS_GOERLI, CONTRACT_ADDRESS_BSC_TESTNET} from '@env';
 import CONTRACT_ABI from '@assets/sources/secretsAbi.json';
 
 interface IWalletContext {
@@ -53,7 +53,7 @@ const WalletProvider: FC<IContextProvider> = ({children}) => {
   const address = useAddress();
 
   // definition of the contract
-  const {contract, isLoading: isLoadingContract, error: errorContract} = useContract(CONTRACT_ADDRESS, CONTRACT_ABI);
+  const {contract, isLoading: isLoadingContract, error: errorContract} = useContract(CONTRACT_ADDRESS_GOERLI, CONTRACT_ABI);
 
   // getNotesByAddressWithPagination
   const {
@@ -101,7 +101,7 @@ const WalletProvider: FC<IContextProvider> = ({children}) => {
       value={{
         // addresses
         userAddress: address,
-        contractAddress: CONTRACT_ADDRESS,
+        contractAddress: CONTRACT_ADDRESS_GOERLI,
         // pagination
         currentPage,
         setCurrentPage,
