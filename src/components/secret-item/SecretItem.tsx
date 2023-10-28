@@ -1,4 +1,4 @@
-import {FC, useContext} from 'react';
+import {FC, useContext, useEffect} from 'react';
 import {TouchableOpacity, TouchableOpacityProps, StyleSheet, Dimensions, View} from 'react-native';
 import NoteText from '@components/text/NoteText';
 import {useTheme} from '@react-navigation/native';
@@ -33,6 +33,7 @@ interface ISecretItem extends TouchableOpacityProps {
   onDelete?: (id: string) => void;
   simultaneousHandler?: any;
   panRef?: any;
+  triggeredSecretItem: boolean;
 }
 
 const ScreenWidth = Dimensions.get('window').width;
@@ -50,9 +51,16 @@ const SecretItem: FC<ISecretItem> = ({
   style,
   panRef,
   simultaneousHandler,
+  triggeredSecretItem,
   onDelete = () => {},
   ...props
 }) => {
+  useEffect(() => {
+    console.log('triggered');
+  }, []);
+
+  console.log('triggered2: ', triggeredSecretItem);
+
   const {colors} = useTheme();
   const {themeValue} = useContext(ThemeContext);
 
@@ -60,6 +68,16 @@ const SecretItem: FC<ISecretItem> = ({
   const itemHeight = useSharedValue(undefined);
   const marginVertical = useSharedValue(8);
   const containerOpacity = useSharedValue(1);
+
+  useEffect(() => {
+    if (triggeredSecretItem) {
+      // triggered true ise animasyonun başlangıç değerlerine dön
+      translateX.value = withTiming(0);
+      itemHeight.value = withTiming(undefined);
+      marginVertical.value = withTiming(8);
+      containerOpacity.value = withTiming(1);
+    }
+  }, [triggeredSecretItem]);
 
   const panGesture = useAnimatedGestureHandler<PanGestureHandlerGestureEvent>({
     onActive: event => {
@@ -127,9 +145,7 @@ const SecretItem: FC<ISecretItem> = ({
               <NoteText style={styles.dateText}>{moment.unix(createdAt).format('DD MMMM YYYY')}</NoteText>
             </View>
 
-            <NoteText
-              style={[styles.priorityText, {color: getNotePriorityColor(themeValue, colors, priority)}]}
-              weight="700">
+            <NoteText style={[styles.priorityText, {color: getNotePriorityColor(themeValue, colors, priority)}]} weight="700">
               {priorityPrettier(priority)}
             </NoteText>
           </View>

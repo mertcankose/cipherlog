@@ -14,14 +14,16 @@ interface IWalletContext {
   // contract
   isLoadingContract: boolean;
   errorContract: any;
-  // user notes size
-  userNotesSize: any;
-  isLoadingUserNotesSize: boolean;
-  errorUserNotesSize: any;
   // user notes
   userNotes: any;
   isLoadingUserNotes: boolean;
   errorUserNotes: any;
+  refetchUserNotes: any;
+  // user notes size
+  userNotesSize: any;
+  isLoadingUserNotesSize: boolean;
+  errorUserNotesSize: any;
+  refetchUserNotesSize: any;
   // mutate note
   mutateNote: any;
   isLoadingMutateNote: boolean;
@@ -48,7 +50,7 @@ export const WalletContext = createContext({} as IWalletContext);
 
 const WalletProvider: FC<IContextProvider> = ({children}) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [resultsPerPage] = useState<number>(2);
+  const [resultsPerPage] = useState<number>(4);
 
   const address = useAddress();
 
@@ -60,6 +62,7 @@ const WalletProvider: FC<IContextProvider> = ({children}) => {
     data: userNotes,
     isLoading: isLoadingUserNotes,
     error: errorUserNotes,
+    refetch: refetchUserNotes,
   } = useContractRead(
     contract,
     'getNotesByAddressWithPagination',
@@ -71,6 +74,7 @@ const WalletProvider: FC<IContextProvider> = ({children}) => {
     data: userNotesSize,
     isLoading: isLoadingUserNotesSize,
     error: errorUserNotesSize,
+    refetch: refetchUserNotesSize,
   } = useContractRead(contract, 'getUserNotesSize', address ? [address] : [FAKE_ADDRESS]);
 
   // setNote | args: (_note, noteContent, _priority)
@@ -109,14 +113,16 @@ const WalletProvider: FC<IContextProvider> = ({children}) => {
         // contract
         isLoadingContract,
         errorContract,
-        // user notes size
-        userNotesSize,
-        isLoadingUserNotesSize,
-        errorUserNotesSize,
         // user notes
         userNotes,
         isLoadingUserNotes,
         errorUserNotes,
+        refetchUserNotes,
+        // user notes size
+        userNotesSize,
+        isLoadingUserNotesSize,
+        errorUserNotesSize,
+        refetchUserNotesSize,
         // mutate note
         mutateNote,
         isLoadingMutateNote,

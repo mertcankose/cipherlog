@@ -19,6 +19,7 @@ declare module '@react-navigation/native' {
       trashBg: string;
       noteItem: string;
       paginationDisabled: string;
+      loadingOverlayBg: string;
     };
   };
   export function useTheme(): ExtendedTheme;

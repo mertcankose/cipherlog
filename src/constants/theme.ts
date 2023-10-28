@@ -19,6 +19,7 @@ const NoteDefaultTheme: ExtendedTheme = {
     inputPlaceholder: '#7D7C7C',
     trashBg: '#FE0000',
     paginationDisabled: '#7D7C7C',
+    loadingOverlayBg: '#FFF6F6',
   },
 };
 
@@ -41,6 +42,7 @@ const NoteDarkTheme: ExtendedTheme = {
     inputPlaceholder: '#D8D9DA',
     trashBg: '#FE0000',
     paginationDisabled: '#7D7C7C',
+    loadingOverlayBg: '#FFF6F6',
   },
 };
 

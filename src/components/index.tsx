@@ -9,3 +9,4 @@ export {default as AccountItem} from './account-item/AccountItem';
 export {default as SecretItem} from './secret-item/SecretItem';
 export {default as BaseModal} from './modal/BaseModal';
 export {default as Onboarding} from './onboarding/Onboarding';
+export {default as Loading} from './loading/Loading';

@@ -1,4 +1,4 @@
-import {Header, SecretItem, NoteButton, NoteText} from '@components';
+import {Header, SecretItem, NoteButton, NoteText, Loading} from '@components';
 import {useContext, FC, useRef, useMemo, useCallback, useEffect, useState} from 'react';
 import {
   FlatList,
@@ -47,7 +47,7 @@ const Notes: FC<INotes> = ({navigation}) => {
     createdAt: 0,
     updatedAt: 0,
   });
-  const [selectedNoteId, setSelectedNoteId] = useState<string>();
+  const [triggeredSecretItem, setTriggeredSecretItem] = useState<boolean>(false);
   const [refreshingNotes, setRefreshingNotes] = useState<boolean>(false);
 
   const flashlistRef = useRef<any>(null);
@@ -65,14 +65,16 @@ const Notes: FC<INotes> = ({navigation}) => {
     // contract
     isLoadingContract,
     errorContract,
-    // user notes size
-    userNotesSize,
-    isLoadingUserNotesSize,
-    errorUserNotesSize,
     // user notes
     userNotes,
     isLoadingUserNotes,
     errorUserNotes,
+    refetchUserNotes,
+    // user notes size
+    userNotesSize,
+    isLoadingUserNotesSize,
+    errorUserNotesSize,
+    refetchUserNotesSize,
     // mutate note
     mutateNote,
     isLoadingMutateNote,
@@ -121,9 +123,7 @@ const Notes: FC<INotes> = ({navigation}) => {
 
   // initialize the user notes from contract
   useEffect(() => {
-    if (userNotes) {
-      getNotesFromBlockchain();
-    }
+    getNotesFromBlockchain();
   }, [userNotes]);
 
   // if setting note is success, close the bottom sheet and reset the note
@@ -138,8 +138,16 @@ const Notes: FC<INotes> = ({navigation}) => {
         createdAt: 0,
         updatedAt: 0,
       });
+      refetchProcess();
     }
   }, [isSuccessMutateNote]);
+
+  useEffect(() => {
+    if (isSuccessDeleteNote) {
+      setTriggeredSecretItem(true);
+      refetchProcess();
+    }
+  }, [isSuccessDeleteNote]);
 
   // control the bottom sheet visibility, if it is visible, focus the text input and if it is not visible, dismiss the keyboard
   useEffect(() => {
@@ -149,6 +157,15 @@ const Notes: FC<INotes> = ({navigation}) => {
       textInputRef.current?.focus();
     }
   }, [isBottomSheetVisible]);
+
+  useEffect(() => {
+    if (errorMutateNote) {
+      //toastMessage('error', 'Error', 'There is a problem to set note');
+      bottomSheetRef.current?.close();
+
+      refetchProcess();
+    }
+  }, [errorMutateNote]);
 
   // control keyboard visibility, if it is not visible, close the bottom sheet
   useEffect(() => {
@@ -168,7 +185,6 @@ const Notes: FC<INotes> = ({navigation}) => {
 
   // control bottom sheet changes
   const handleSheetChanges = useCallback((index: number) => {
-    console.log('handleSheetChanges', index); // 0, -1
     if (index == -1) {
       setIsBottomSheetVisible(false);
     } else {
@@ -186,6 +202,11 @@ const Notes: FC<INotes> = ({navigation}) => {
     navigation.openDrawer();
   };
 
+  const refetchProcess = () => {
+    refetchUserNotesSize();
+    refetchUserNotes();
+  };
+
   const dynamicPaddingBottom = () => {
     // if (isKeyboardVisible) {
     //   return Platform.OS === 'ios' ? 12 : 10;
@@ -195,6 +216,10 @@ const Notes: FC<INotes> = ({navigation}) => {
     return 10;
   };
 
+  useEffect(() => {
+    console.log('ttt: ', triggeredSecretItem);
+  }, [triggeredSecretItem]);
+
   const getNotesFromBlockchain = () => {
     const transformedData = transformData(userNotes);
     console.log('usernotes: ', transformedData);
@@ -203,13 +228,13 @@ const Notes: FC<INotes> = ({navigation}) => {
 
   const onRefreshNotes = useCallback(() => {
     setRefreshingNotes(true);
-    getNotesFromBlockchain();
+    refetchProcess();
     setRefreshingNotes(false);
 
     // setTimeout(() => {
     //   setRefreshingNotes(false);
     // }, 1000);
-  }, []);
+  }, [userNotes]);
 
   const getNotePriorityName = () => {
     return note.priority === 0
@@ -223,8 +248,8 @@ const Notes: FC<INotes> = ({navigation}) => {
 
   const transformData = inputData => {
     return inputData
-      .filter(([id, title, content, priority, createdAt, updatedAt]) => title.length > 0)
-      .map(([id, title, content, priority, createdAt, updatedAt]) => {
+      ?.filter(([id, title, content, priority, createdAt, updatedAt]) => title.length > 0)
+      ?.map(([id, title, content, priority, createdAt, updatedAt]) => {
         return {
           id: parseAndFormat(id),
           title,
@@ -237,23 +262,19 @@ const Notes: FC<INotes> = ({navigation}) => {
   };
 
   const addNoteToChain = async () => {
-    console.log('addNoteToChain', note);
     let createdAt = Math.floor(Date.now() / 1000);
 
     try {
       let result = await mutateNote({args: [note.title, note.content, note.priority, createdAt, createdAt]});
-
-      console.log('result: ', result);
     } catch (error) {
-      toastMessage('error', 'Error', 'There is a problem to set note');
+      // toastMessage('error', 'Error', 'There is a problem to set note');
     }
   };
 
   const removeNote = async (id: string) => {
-    console.log('deleteNote', id);
     // setNotes(notes.filter(note => note.id !== id));
     try {
-      let result = await deleteNote({args: [id]});
+      await deleteNote({args: [parseInt(id)]});
     } catch (error) {
       toastMessage('error', 'Error', 'There is a problem to delete note');
     }
@@ -261,7 +282,9 @@ const Notes: FC<INotes> = ({navigation}) => {
 
   useEffect(() => {
     if (errorDeleteNote) {
-      toastMessage('error', 'Error', 'There is a problem to delete note');
+      setTriggeredSecretItem(true);
+      // toastMessage('error', 'Error', 'There is a problem to delete note');
+      refetchProcess();
     }
   }, [errorDeleteNote]);
 
@@ -317,7 +340,8 @@ const Notes: FC<INotes> = ({navigation}) => {
         }
       />
 
-      {isLoadingMutateNote && <ActivityIndicator size="large" color={colors.primary} style={{marginTop: 10}} />}
+      {isLoadingMutateNote && <Loading />}
+      {isLoadingDeleteNote && <Loading />}
 
       {!userAddress && (
         <NoteButton
@@ -330,7 +354,7 @@ const Notes: FC<INotes> = ({navigation}) => {
         </NoteButton>
       )}
 
-      {userAddress && notes.length == 0 && (
+      {userAddress && notes?.length == 0 && (
         <NoteButton
           style={{
             backgroundColor: 'transparent',
@@ -341,7 +365,7 @@ const Notes: FC<INotes> = ({navigation}) => {
         </NoteButton>
       )}
 
-      <View style={{borderWidth: 0}}>
+      <View style={{flex: 1, paddingBottom: 24}}>
         <NativeViewGestureHandler ref={flashlistRef} simultaneousHandlers={panRef}>
           <FlatList
             data={notes}
@@ -351,6 +375,8 @@ const Notes: FC<INotes> = ({navigation}) => {
               paddingTop: 12,
             }}
             showsVerticalScrollIndicator={false}
+            //extraData={errorDeleteNote}
+            extraData={notes}
             renderItem={({item}) => (
               <SecretItem
                 // onPress={() => setSelectedNoteId(item.id)}
@@ -364,6 +390,7 @@ const Notes: FC<INotes> = ({navigation}) => {
                 onDelete={removeNote}
                 simultaneousHandler={flashlistRef}
                 panRef={panRef}
+                triggeredSecretItem={triggeredSecretItem}
               />
             )}
             keyExtractor={item => item.id}
@@ -376,7 +403,6 @@ const Notes: FC<INotes> = ({navigation}) => {
                 }}
               />
             )}
-            extraData={selectedNoteId}
             refreshControl={
               <RefreshControl
                 refreshing={refreshingNotes}
@@ -389,42 +415,44 @@ const Notes: FC<INotes> = ({navigation}) => {
             // estimatedItemSize={4}
           />
         </NativeViewGestureHandler>
-        {notes.length > 0 && (
-          <View style={styles.paginationContainer}>
-            <NoteButton
-              onPress={handlePrevPage}
-              style={[
-                styles.paginationButton,
-                {
-                  backgroundColor: isFirstPage ? colors.paginationDisabled : colors.primary,
-                },
-              ]}
-              disabled={isFirstPage}>
-              <AntDesign name="left" size={18} color="#fff" />
-            </NoteButton>
+        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20}}>
+          {notes?.length > 0 && (
+            <View style={styles.paginationContainer}>
+              <NoteButton
+                onPress={handlePrevPage}
+                style={[
+                  styles.paginationButton,
+                  {
+                    backgroundColor: isFirstPage ? colors.paginationDisabled : colors.primary,
+                  },
+                ]}
+                disabled={isFirstPage}>
+                <AntDesign name="left" size={18} color="#fff" />
+              </NoteButton>
 
-            <NoteText style={[styles.paginationText, {color: colors.text}]} weight="600">
-              {`${currentPage}/${totalPages}`}
-            </NoteText>
+              <NoteText style={[styles.paginationText, {color: colors.text}]} weight="600">
+                {`${currentPage}/${totalPages}`}
+              </NoteText>
 
-            <NoteButton
-              onPress={handleNextPage}
-              style={[
-                styles.paginationButton,
-                {
-                  backgroundColor: isLastPage ? colors.paginationDisabled : colors.primary,
-                },
-              ]}
-              disabled={isLastPage}>
-              <AntDesign name="right" size={18} color="#fff" />
-            </NoteButton>
-          </View>
-        )}
+              <NoteButton
+                onPress={handleNextPage}
+                style={[
+                  styles.paginationButton,
+                  {
+                    backgroundColor: isLastPage ? colors.paginationDisabled : colors.primary,
+                  },
+                ]}
+                disabled={isLastPage}>
+                <AntDesign name="right" size={18} color="#fff" />
+              </NoteButton>
+            </View>
+          )}
+
+          <NoteButton onPress={handleSheetPress} style={[styles.plusButton, {marginLeft: 'auto'}]}>
+            <Octicons name="plus" size={24} color="#fff" />
+          </NoteButton>
+        </View>
       </View>
-
-      <NoteButton onPress={handleSheetPress} style={styles.plusButton}>
-        <Octicons name="plus" size={26} color="#fff" />
-      </NoteButton>
 
       <BottomSheet
         ref={bottomSheetRef}
@@ -661,7 +689,7 @@ const styles = StyleSheet.create({
   paginationContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    paddingLeft: 16,
+    // paddingLeft: 16,
     alignItems: 'center',
     marginTop: 12,
   },
@@ -677,12 +705,11 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
   plusButton: {
-    position: 'absolute',
-    bottom: 48,
-    right: 32,
-    borderWidth: 0,
-    width: 56,
-    height: 56,
+    // position: 'absolute',
+    // bottom: 48,
+    // right: 32,
+    width: 52,
+    height: 52,
     borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
