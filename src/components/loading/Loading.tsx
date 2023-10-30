@@ -20,13 +20,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
-    top: 0,
+    top: 80,
     bottom: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
+    // alignItems: 'center',
+    // justifyContent: 'center',
     opacity: 0.8,
-    elevation: 1000,
-    zIndex: 1000,
+    elevation: 9999999,
+    zIndex: 999999999,
   },
 });
 

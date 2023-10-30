@@ -24,7 +24,7 @@ import {useTranslation} from 'react-i18next';
 import {useTheme} from '@react-navigation/native';
 import useKeyboardVisibility from '@hooks/useKeyboardVisibility';
 import {ConnectWallet, Web3Button} from '@thirdweb-dev/react-native';
-import {NativeViewGestureHandler} from 'react-native-gesture-handler';
+import {GestureHandlerRootView, NativeViewGestureHandler} from 'react-native-gesture-handler';
 import {WalletContext} from '@contexts/Wallet';
 import {ethers} from 'ethers';
 import {toastMessage} from '@utils/toast';
@@ -78,8 +78,10 @@ const Notes: FC<INotes> = ({navigation}) => {
     // mutate note
     mutateNote,
     isLoadingMutateNote,
+    isErrorMutateNote,
     errorMutateNote,
     isSuccessMutateNote,
+    resetMutateNote,
     // update note
     updateNote,
     isLoadingUpdateNote,
@@ -117,7 +119,7 @@ const Notes: FC<INotes> = ({navigation}) => {
   /* BOTTOM SHEET START*/
   const isKeyboardVisible = useKeyboardVisibility();
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ['30%'], []);
+  const snapPoints = ['40%'];
   const [isBottomSheetVisible, setIsBottomSheetVisible] = useState<boolean>(false);
   const textInputRef = useRef<TextInput>(null);
 
@@ -125,6 +127,13 @@ const Notes: FC<INotes> = ({navigation}) => {
   useEffect(() => {
     getNotesFromBlockchain();
   }, [userNotes]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refetchProcess();
+    }, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   // if setting note is success, close the bottom sheet and reset the note
   useEffect(() => {
@@ -159,13 +168,15 @@ const Notes: FC<INotes> = ({navigation}) => {
   }, [isBottomSheetVisible]);
 
   useEffect(() => {
-    if (errorMutateNote) {
+    if (isErrorMutateNote) {
       //toastMessage('error', 'Error', 'There is a problem to set note');
       bottomSheetRef.current?.close();
-
+      if (errorMutateNote.reason !== 'overflow') {
+        toastMessage('error', 'Error', errorMutateNote?.reason);
+      }
       refetchProcess();
     }
-  }, [errorMutateNote]);
+  }, [isErrorMutateNote]);
 
   // control keyboard visibility, if it is not visible, close the bottom sheet
   useEffect(() => {
@@ -205,6 +216,7 @@ const Notes: FC<INotes> = ({navigation}) => {
   const refetchProcess = () => {
     refetchUserNotesSize();
     refetchUserNotes();
+    resetMutateNote();
   };
 
   const dynamicPaddingBottom = () => {
@@ -216,10 +228,6 @@ const Notes: FC<INotes> = ({navigation}) => {
     return 10;
   };
 
-  useEffect(() => {
-    console.log('ttt: ', triggeredSecretItem);
-  }, [triggeredSecretItem]);
-
   const getNotesFromBlockchain = () => {
     const transformedData = transformData(userNotes);
     console.log('usernotes: ', transformedData);
@@ -229,6 +237,7 @@ const Notes: FC<INotes> = ({navigation}) => {
   const onRefreshNotes = useCallback(() => {
     setRefreshingNotes(true);
     refetchProcess();
+
     setRefreshingNotes(false);
 
     // setTimeout(() => {
@@ -329,11 +338,11 @@ const Notes: FC<INotes> = ({navigation}) => {
                   },
                 ]}
                 weight="600">
-                Connected
+                {t('connected')}
               </NoteText>
             ) : (
-              <NoteText style={[styles.notConnectedText, {}]} weight="600">
-                Not Connected
+              <NoteText style={[styles.notConnectedText, {color: colors.text}]} weight="600">
+                {t('notConnected')}
               </NoteText>
             )}
           </TouchableOpacity>
@@ -347,10 +356,10 @@ const Notes: FC<INotes> = ({navigation}) => {
         <NoteButton
           style={{
             backgroundColor: 'transparent',
-            paddingTop: 8,
+            paddingTop: 12,
           }}
           onPress={openSidebar}>
-          <NoteText>Henüz bağlı değilsiniz!</NoteText>
+          <NoteText style={{color: colors.text}}>{t('notConnectedYet')}</NoteText>
         </NoteButton>
       )}
 
@@ -361,11 +370,11 @@ const Notes: FC<INotes> = ({navigation}) => {
             paddingTop: 12,
           }}
           onPress={handleSheetPress}>
-          <NoteText>Bir şeyler yaz...</NoteText>
+          <NoteText>{t('writeSomething')}</NoteText>
         </NoteButton>
       )}
 
-      <View style={{flex: 1, paddingBottom: 24}}>
+      <GestureHandlerRootView style={{flex: 1, paddingBottom: 24}}>
         <NativeViewGestureHandler ref={flashlistRef} simultaneousHandlers={panRef}>
           <FlatList
             data={notes}
@@ -452,18 +461,25 @@ const Notes: FC<INotes> = ({navigation}) => {
             <Octicons name="plus" size={24} color="#fff" />
           </NoteButton>
         </View>
-      </View>
+      </GestureHandlerRootView>
 
       <BottomSheet
         ref={bottomSheetRef}
         index={-1}
-        snapPoints={snapPoints}
+        // snapPoints={snapPoints}
+        snapPoints={[Platform.OS === 'ios' ? '32%' : '50%']}
         enablePanDownToClose={true}
         backdropComponent={renderBackdrop}
         onChange={handleSheetChanges}
+        detached={false}
         // name="AddNoteSheet"
         // keyboardBehavior="interactive"
         // keyboardBlurBehavior="restore"
+
+        keyboardBehavior={'interactive'}
+        keyboardBlurBehavior="restore"
+        enableContentPanningGesture={false}
+        android_keyboardInputMode="adjustResize"
         handleIndicatorStyle={{
           backgroundColor: themeValue === 'light' ? '#000' : '#fff',
         }}
@@ -478,12 +494,14 @@ const Notes: FC<INotes> = ({navigation}) => {
             {
               backgroundColor: colors.sheetBg,
               paddingBottom: dynamicPaddingBottom(),
+              // borderWidth: 2,
             },
           ]}>
           <View
             style={{
               flexDirection: 'column',
               marginBottom: 2,
+              // borderWidth: 3,
             }}>
             <BottomSheetTextInput
               // @ts-ignore
@@ -494,23 +512,29 @@ const Notes: FC<INotes> = ({navigation}) => {
               maxLength={36}
               selectionColor={colors.inputSelection}
               placeholderTextColor={colors.inputPlaceholder}
-              style={styles.bottomSheetTitleInput}
+              style={[styles.bottomSheetTitleInput, {color: colors.text}]}
             />
             <BottomSheetTextInput
               defaultValue={note.content}
               onChangeText={text => setNote({...note, content: text})}
               placeholder="Description"
               blurOnSubmit={false}
-              numberOfLines={4}
+              numberOfLines={3}
               multiline
               scrollEnabled={false}
               selectionColor={colors.inputSelection}
               placeholderTextColor={colors.inputPlaceholder}
-              style={styles.bottomSheetDescriptionInput}
+              style={[styles.bottomSheetDescriptionInput, {color: colors.text}]}
             />
           </View>
 
-          <View style={styles.sheetModalBottom}>
+          <View
+            style={[
+              styles.sheetModalBottom,
+              {
+                // borderWidth: 2,
+              },
+            ]}>
             <Menu>
               <MenuTrigger style={styles.priorityTriggerButton}>
                 <SimpleLineIcons name="graph" size={22} color={getNotePriorityColor(themeValue, colors, note.priority)} />
@@ -624,7 +648,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   menuOptionsContainer: {
-    marginTop: Platform.OS === 'ios' ? -180 : -130,
+    marginTop: Platform.OS === 'ios' ? -180 : -70,
     borderRadius: 6,
     /*
     shadowColor: "#000",
@@ -672,7 +696,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     paddingVertical: 16,
     fontSize: 18,
-    height: Platform.OS === 'ios' ? 90 : 'auto',
+    height: Platform.OS === 'ios' ? 80 : 80,
     textAlignVertical: 'top',
     fontFamily: 'SourceCodePro-Regular',
   },

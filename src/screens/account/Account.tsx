@@ -194,7 +194,7 @@ const Account: FC<IAccount> = ({navigation}) => {
                 },
               ]}
               weight="600">
-              NoteDapp
+              Cipherlog
             </NoteText>
 
             <View style={{gap: 10, flexDirection: 'column', marginTop: 8}}>
@@ -214,14 +214,14 @@ const Account: FC<IAccount> = ({navigation}) => {
                   openLink('https://mertcankose.com');
                 }}
               />
-              <AccountItem
+              {/* <AccountItem
                 itemIcon={<MaterialIcons name="star-rate" size={23} color="#279EFF" />}
                 itemName={t('ratesecret')}
                 rightIcon={<Feather name="arrow-up-right" size={22} color="#279EFF" />}
                 onPress={() => {
                   openLink('https://mertcankose.com');
                 }}
-              />
+              /> */}
             </View>
           </View>
 
@@ -243,7 +243,7 @@ const Account: FC<IAccount> = ({navigation}) => {
                 itemName="Twitter"
                 rightIcon={<Feather name="arrow-up-right" size={22} color="#279EFF" />}
                 onPress={() => {
-                  openLink('https://twitter.com');
+                  openLink('https://twitter.com/mertcankose_');
                 }}
               />
               <AccountItem
@@ -251,17 +251,17 @@ const Account: FC<IAccount> = ({navigation}) => {
                 itemName="Instagram"
                 rightIcon={<Feather name="arrow-up-right" size={22} color="#279EFF" />}
                 onPress={() => {
-                  openLink('https://instagram.com');
+                  openLink('https://www.instagram.com/mertcankse_/');
                 }}
               />
-              <AccountItem
+              {/* <AccountItem
                 itemIcon={<SimpleLineIcons name="social-reddit" size={23} color="#279EFF" />}
                 itemName="Reddit"
                 rightIcon={<Feather name="arrow-up-right" size={22} color="#279EFF" />}
                 onPress={() => {
                   openLink('https://reddit.com');
                 }}
-              />
+              /> */}
             </View>
           </View>
         </ScrollView>

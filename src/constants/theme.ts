@@ -31,7 +31,7 @@ const NoteDarkTheme: ExtendedTheme = {
     text: '#fff',
     primary: '#279EFF',
     accountItem: '#61677A',
-    noteItem: '#F0F0F0',
+    noteItem: '#F6F1EE',
     pale: '#F5F7F8',
     sheetBg: '#61677A',
     urgent: '#ef4444',

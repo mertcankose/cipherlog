@@ -17,7 +17,7 @@ export const getNotePriorityColor = (themeValue: string, colors: any, priority: 
   return priority === 0
     ? themeValue === 'light'
       ? colors.none
-      : '#fff'
+      : '#7D7C7C'
     : priority === 1
     ? colors.normal
     : priority === 2

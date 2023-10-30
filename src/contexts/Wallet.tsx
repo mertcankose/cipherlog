@@ -1,6 +1,6 @@
-import {FC, ReactNode, useState, createContext, useEffect} from 'react';
+import {FC, ReactNode, useState, createContext} from 'react';
 import {useContract, useContractRead, useContractWrite, useAddress} from '@thirdweb-dev/react-native';
-import {CONTRACT_ADDRESS_GOERLI, CONTRACT_ADDRESS_BSC_TESTNET} from '@env';
+import {CONTRACT_ADDRESS_GOERLI} from '@env';
 import CONTRACT_ABI from '@assets/sources/secretsAbi.json';
 
 interface IWalletContext {
@@ -27,8 +27,10 @@ interface IWalletContext {
   // mutate note
   mutateNote: any;
   isLoadingMutateNote: boolean;
+  isErrorMutateNote: boolean;
   errorMutateNote: any;
   isSuccessMutateNote: any;
+  resetMutateNote: any;
   // update note
   updateNote: any;
   isLoadingUpdateNote: boolean;
@@ -44,7 +46,7 @@ interface IContextProvider {
   children: ReactNode;
 }
 
-const FAKE_ADDRESS = '0xa4A0Bacdfacbd22cdCeF8c6fDF703CA533D4E48B';
+const FAKE_ADDRESS = '0x00098A651DEA7b200Dc9330B1aD5C0090a134000';
 
 export const WalletContext = createContext({} as IWalletContext);
 
@@ -81,8 +83,10 @@ const WalletProvider: FC<IContextProvider> = ({children}) => {
   const {
     mutate: mutateNote,
     isLoading: isLoadingMutateNote,
+    isError: isErrorMutateNote,
     error: errorMutateNote,
     isSuccess: isSuccessMutateNote,
+    reset: resetMutateNote,
   } = useContractWrite(contract, 'setNote');
 
   // updateNoteBySender | args: (_noteId, _note, _noteContent, _priority)
@@ -126,8 +130,10 @@ const WalletProvider: FC<IContextProvider> = ({children}) => {
         // mutate note
         mutateNote,
         isLoadingMutateNote,
+        isErrorMutateNote,
         errorMutateNote,
         isSuccessMutateNote,
+        resetMutateNote,
         // update note
         updateNote,
         isLoadingUpdateNote,

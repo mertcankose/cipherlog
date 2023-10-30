@@ -16,17 +16,13 @@ interface IStatusBar extends StatusBarProps {
 
 const NoteStatusBar: FC<IStatusBar> = ({...props}) => {
   const {themeValue} = useContext(ThemeContext);
-  const {colors} = useTheme();
 
+  // colors are wroted manually because of the provider cascade
   return (
-    <View
-      style={[
-        {backgroundColor: themeValue === 'dark' ? '#272829' : '#F5F7F8'},
-        {height: getExactStatusBarHeight()},
-      ]}>
+    <View style={[{backgroundColor: themeValue === 'dark' ? '#272829' : '#F5F7F8'}, {height: getExactStatusBarHeight()}]}>
       <StatusBar
         translucent
-        backgroundColor={colors.background}
+        backgroundColor={themeValue === 'dark' ? '#272829' : '#F5F7F8'}
         barStyle={themeValue === 'dark' ? 'light-content' : 'dark-content'}
         {...props}
       />

@@ -13,6 +13,7 @@ import AppInside from '@navigation/AppInside';
 import SplashScreen from 'react-native-splash-screen';
 import {Platform} from 'react-native';
 import {ThemeContext} from '@contexts/Theme';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
 /*
 rainbow -> only ethereum network
@@ -29,39 +30,41 @@ const App = () => {
   }, []);
 
   return (
-    <ThirdwebProvider
-      activeChain={activeChain}
-      clientId={THIRD_WEB_PROJECT_ID}
-      dAppMeta={{
-        name: 'Cipherlog',
-        description: 'Cipherlog is a decentralized application that allows you to store your secrets in a decentralized way.',
-        logoUrl: 'https://mertcankose.com/ciphernote/ciphernote-icon.png',
-        url: 'https://mertcankose.com/',
-        isDarkMode: themeValue === 'light' ? false : true,
-      }}
-      authConfig={{
-        domain: 'https://mertcankose.com',
-      }}
-      supportedChains={[Goerli]}
-      supportedWallets={[
-        metamaskWallet({
-          projectId: WALLET_CONNECT_PROJECT_ID,
-          recommended: true,
-        }),
-        walletConnect(),
-      ]}>
-      <GeneralProvider>
-        <WalletProvider>
-          <ThemeProvider>
-            <LangProvider>
-              <MenuProvider>
-                <AppInside />
-              </MenuProvider>
-            </LangProvider>
-          </ThemeProvider>
-        </WalletProvider>
-      </GeneralProvider>
-    </ThirdwebProvider>
+    <GestureHandlerRootView style={{flex: 1}}>
+      <ThirdwebProvider
+        activeChain={activeChain}
+        clientId={THIRD_WEB_PROJECT_ID}
+        dAppMeta={{
+          name: 'Cipherlog',
+          description: 'Cipherlog is a decentralized application that allows you to store your secrets in a decentralized way.',
+          logoUrl: 'https://mertcankose.com/ciphernote/ciphernote-icon.png',
+          url: 'https://mertcankose.com/',
+          isDarkMode: themeValue === 'light' ? false : true,
+        }}
+        authConfig={{
+          domain: 'https://mertcankose.com',
+        }}
+        supportedChains={[Goerli]}
+        supportedWallets={[
+          metamaskWallet({
+            projectId: WALLET_CONNECT_PROJECT_ID,
+            recommended: true,
+          }),
+          walletConnect(),
+        ]}>
+        <GeneralProvider>
+          <WalletProvider>
+            <ThemeProvider>
+              <LangProvider>
+                <MenuProvider>
+                  <AppInside />
+                </MenuProvider>
+              </LangProvider>
+            </ThemeProvider>
+          </WalletProvider>
+        </GeneralProvider>
+      </ThirdwebProvider>
+    </GestureHandlerRootView>
   );
 };
 

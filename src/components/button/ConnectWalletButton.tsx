@@ -4,6 +4,7 @@ import NoteText from '@components/text/NoteText';
 import {WalletContext} from '@contexts/Wallet';
 import {useTranslation} from 'react-i18next';
 import {ConnectWallet} from '@thirdweb-dev/react-native';
+import {ThemeContext} from '@contexts/Theme';
 
 interface IConnectWalletButtonProps {
   style?: any;
@@ -12,9 +13,11 @@ interface IConnectWalletButtonProps {
 const ConnectWalletButton: FC<IConnectWalletButtonProps> = ({style, ...props}) => {
   const {t} = useTranslation();
 
+  const {themeValue} = useContext(ThemeContext);
+
   return (
     <View style={[styles.connectWalletContainer, style]} {...props}>
-      <ConnectWallet switchToActiveChain={false} buttonTitle="Connect Wallet" />
+      <ConnectWallet switchToActiveChain={true} buttonTitle="Connect Wallet" theme={themeValue === 'light' ? 'light' : 'dark'} />
     </View>
   );
 };

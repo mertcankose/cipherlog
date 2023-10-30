@@ -1,5 +1,5 @@
 import {FC, useContext, useEffect} from 'react';
-import {TouchableOpacity, TouchableOpacityProps, StyleSheet, Dimensions, View} from 'react-native';
+import {TouchableOpacity, TouchableOpacityProps, StyleSheet, Dimensions, View, Platform} from 'react-native';
 import NoteText from '@components/text/NoteText';
 import {useTheme} from '@react-navigation/native';
 import Animated, {
@@ -55,24 +55,19 @@ const SecretItem: FC<ISecretItem> = ({
   onDelete = () => {},
   ...props
 }) => {
-  useEffect(() => {
-    console.log('triggered');
-  }, []);
-
-  console.log('triggered2: ', triggeredSecretItem);
-
   const {colors} = useTheme();
   const {themeValue} = useContext(ThemeContext);
 
   const translateX = useSharedValue(0);
   const itemHeight = useSharedValue(undefined);
-  const marginVertical = useSharedValue(8);
+  const marginVertical = useSharedValue(Platform.OS === 'ios' ? 8 : 12);
   const containerOpacity = useSharedValue(1);
 
   useEffect(() => {
     if (triggeredSecretItem) {
       // triggered true ise animasyonun başlangıç değerlerine dön
       translateX.value = withTiming(0);
+      // @ts-ignore
       itemHeight.value = withTiming(undefined);
       marginVertical.value = withTiming(8);
       containerOpacity.value = withTiming(1);

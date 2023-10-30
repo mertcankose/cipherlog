@@ -10,6 +10,7 @@ export const toastMessage = (type: 'success' | 'error' | 'info', text1: string, 
     autoHide: true,
     position: 'top',
     topOffset: getExactStatusBarHeight() + 8,
+
     //bottomOffset: tabHeight + 8,
   });
 };
