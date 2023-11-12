@@ -2,11 +2,13 @@
     "translation": {
       "hello":"Hello",
       "how":"How",
+      "about":"About",
       "account":"Account",
       "balance":"Balance",
       "wallet":"Wallet",
       "address":"Address",
       "language":"Language",
+      "contact":"Contact Us",
       "theme":"Theme",
       "support":"Support",
       "homepage":"Homepage",
@@ -36,6 +38,15 @@
       "onboardingTitle2": "Safely Keep Your Notes",
       "onboardingDescription2": "Save your thoughts without worry. Secure your notes with blockchain technology.",
       "onboardingTitle3": "Personalized Notes",
-      "onboardingDescription3": "Choose colors, organize notes, and experience the note-taking journey you've imagined. Your notes, your style!"
+      "onboardingDescription3": "Choose colors, organize notes, and experience the note-taking journey you've imagined. Your notes, your style!",
+      "appDescription": "Cipherlog is a mobile application that simplifies the note-taking process and enhances your security. With its minimalist design and intuitive interface, you can quickly and easily take notes.",
+      "securityFeature": "The app allows you to protect your notes by adding an additional layer of security. By integrating your own crypto wallet, you can ensure high-level security for your notes and track your transactions in the crypto world.",
+      "highlightedFeatures": "Highlighted Features:",
+      "minimalistDesign": "- Minimalist design and user-friendly interface",
+      "quickNoteTaking": "- Quick and easy note-taking",
+      "enhancedSecurity": "- Enhanced security with crypto wallet integration",
+      "keepTrackOfNotes": "- Ability to keep personal notes safe and track them",
+      "downloadCipherlog": "- Download Cipherlog and elevate your note-taking experience to a secure and user-friendly level!",
+      "privacyPolicy":"Privacy Policy"
     }
   }

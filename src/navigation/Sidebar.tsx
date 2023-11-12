@@ -1,17 +1,20 @@
 import {FC, useContext} from 'react';
-import {NoteText, WalletProfile} from '@components';
+import {NoteButton, NoteText, WalletProfile} from '@components';
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
   DrawerItemList,
   DrawerContentComponentProps,
 } from '@react-navigation/drawer';
-import {NotesStack, AccountStack} from '@stacks';
+import {NotesStack, AccountStack, AboutStack} from '@stacks';
 import {View, StyleSheet} from 'react-native';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
+import Feather from 'react-native-vector-icons/Feather';
 import {useTranslation} from 'react-i18next';
 import {useTheme} from '@react-navigation/native';
-import {WalletContext} from '@contexts/Wallet';
+import IntroStack from '@stacks/IntroStack';
+import {GeneralContext} from '@contexts/General';
+import {getExactStatusBarHeight} from '@helpers/status-bar-height';
 
 const Drawer = createDrawerNavigator();
 
@@ -21,9 +24,6 @@ interface CustomDrawerContentProps extends DrawerContentComponentProps {
 
 const CustomDrawer: FC<CustomDrawerContentProps> = props => {
   const {colors} = useTheme();
-  const {t} = useTranslation();
-
-  const {userAddress} = useContext(WalletContext);
 
   return (
     <View
@@ -31,6 +31,7 @@ const CustomDrawer: FC<CustomDrawerContentProps> = props => {
         styles.drawerContainer,
         {
           backgroundColor: colors.background,
+          paddingTop: getExactStatusBarHeight(),
         },
       ]}>
       <WalletProfile
@@ -52,6 +53,10 @@ const CustomDrawer: FC<CustomDrawerContentProps> = props => {
           flex: 1,
         }}>
         <DrawerItemList {...props} />
+
+        {/* <NoteButton>
+          <NoteText>İ</NoteText>
+        </NoteButton> */}
       </DrawerContentScrollView>
     </View>
   );
@@ -60,10 +65,11 @@ const CustomDrawer: FC<CustomDrawerContentProps> = props => {
 const Sidebar: FC = () => {
   const {t} = useTranslation();
   const {colors} = useTheme();
+  const {isOnboarding} = useContext(GeneralContext);
 
   return (
     <Drawer.Navigator
-      initialRouteName="NotesStack"
+      initialRouteName={isOnboarding ? 'IntroStack' : 'NotesStack'}
       screenOptions={{
         drawerStyle: {
           width: 270,
@@ -82,6 +88,15 @@ const Sidebar: FC = () => {
         },
       }}
       drawerContent={props => <CustomDrawer {...props} />}>
+      <Drawer.Screen
+        name="IntroStack"
+        component={IntroStack}
+        options={{
+          drawerItemStyle: {
+            display: 'none',
+          },
+        }}
+      />
       <Drawer.Screen
         name="NotesStack"
         component={NotesStack}
@@ -116,6 +131,29 @@ const Sidebar: FC = () => {
             </NoteText>
           ),
           drawerIcon: ({color}) => <SimpleLineIcons name="ghost" size={20} color={color} />,
+        }}
+      />
+      <Drawer.Screen
+        name="AboutStack"
+        component={AboutStack}
+        options={{
+          title: 'About',
+          drawerItemStyle: {
+            // display: 'none',
+            marginTop: 'auto',
+            marginBottom: 20,
+          },
+          drawerLabel: ({color}) => (
+            <NoteText
+              style={{
+                fontSize: 20,
+                marginLeft: -20,
+                color: color,
+              }}>
+              {t('about')}
+            </NoteText>
+          ),
+          drawerIcon: ({color}) => <Feather name="info" size={20} color={color} />,
         }}
       />
     </Drawer.Navigator>

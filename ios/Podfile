@@ -26,7 +26,7 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
-target 'NoteDapp' do
+target 'cipherlog' do
   use_expo_modules!
   post_integrate do |installer|
     begin
@@ -54,7 +54,7 @@ target 'NoteDapp' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
-  target 'NoteDappTests' do
+  target 'cipherlogTests' do
     inherit! :complete
     # Pods for testing
   end

@@ -1,14 +1,8 @@
-import {FC, useContext, useEffect, useState} from 'react';
-import {StatusBar, View, Platform, StatusBarProps} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {FC, useContext} from 'react';
+import {StatusBar, View, StatusBarProps} from 'react-native';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
-import {hasDynamicIsland} from 'react-native-device-info';
 import {getExactStatusBarHeight} from '@helpers/status-bar-height';
 import {ThemeContext} from '@contexts/Theme';
-import {useTheme} from '@react-navigation/native';
-
-const STATUSBAR_HEIGHT = getStatusBarHeight();
-
 interface IStatusBar extends StatusBarProps {
   // backgroundColor: string;
   // barStyle: any;

@@ -1,6 +1,6 @@
-# Note Dapp
+# Cipherlog
 
-Note Dapp is a minimalist note-taking app built with React Native. It provides users with a simple and intuitive interface for quick and easy note creation.
+Cipherlog is a minimalist note-taking app built with React Native. It provides users with a simple and intuitive interface for quick and easy note creation.
 
 ## Features
 

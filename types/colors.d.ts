@@ -20,6 +20,10 @@ declare module '@react-navigation/native' {
       noteItem: string;
       paginationDisabled: string;
       loadingOverlayBg: string;
+      card: string;
+      border: string;
+      notification: string;
+      contactText: string;
     };
   };
   export function useTheme(): ExtendedTheme;

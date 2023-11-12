@@ -2,11 +2,13 @@
   "translation": {
       "hello": "Merhaba",
       "how": "Nasıl",
+      "about":"Hakkımızda",
       "account": "Hesap",
       "balance": "Bakiye",
       "wallet": "Cüzdan",
       "address": "Adres",
       "language": "Dil",
+      "contact":"Bizimle İletişime Geç",
       "theme": "Tema",
       "support": "Destek",
       "homepage": "Ana Sayfa",
@@ -36,6 +38,15 @@
       "onboardingTitle2":"Notlarını Güvenle Sakla",
       "onboardingDescription2":"Endişelenmeden düşüncelerini kaydet. Blockchain teknolojisi ile notlarınızı güven altına alın.",
       "onboardingTitle3":"Kişiselleştirilmiş Notlar",
-      "onboardingDescription3":"Renkleri seç, notları düzenle, hayal ettiğin gibi bir not deneyimi yaşa. Senin notların, senin tarzın!"
+      "onboardingDescription3":"Renkleri seç, notları düzenle, hayal ettiğin gibi bir not deneyimi yaşa. Senin notların, senin tarzın!",
+      "appDescription": "Cipherlog, alma sürecini basitleştiren ve güvenliğinizi artıran bir mobil uygulamadır. Minimalist tasarımı ve sezgisel arayüzü sayesinde hızlı ve kolay notlar alabilirsiniz.",
+      "securityFeature": "Uygulama, notlarınızı ek bir güvenlik katmanı ekleyerek ve kendi kripto cüzdanınızı entegre ederek, notlarınıza yüksek düzeyde güvenlik sağlayabilir ve kripto dünyasındaki işlemlerinizi takip edebilirsiniz.",
+      "highlightedFeatures": "Öne Çıkan Özellikler:",
+      "minimalistDesign": "- Minimalist tasarım ve kullanıcı dostu arayüz",
+      "quickNoteTaking": "- Hızlı ve kolay not alma",
+      "enhancedSecurity": "- Kripto cüzdan entegrasyonu ile artırılmış güvenlik",
+      "keepTrackOfNotes": "- Kişisel notları güvende tutma ve izleme imkanı",
+      "downloadCipherlog": "- Cipherlog'u indirin ve not alma deneyiminizi güvenli ve kullanıcı dostu bir seviyeye taşıyın!",
+      "privacyPolicy":"Gizlilik Sözleşmesi"
   }
 }

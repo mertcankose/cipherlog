@@ -20,6 +20,7 @@ const NoteDefaultTheme: ExtendedTheme = {
     trashBg: '#FE0000',
     paginationDisabled: '#7D7C7C',
     loadingOverlayBg: '#FFF6F6',
+    contactText: '#fff',
   },
 };
 
@@ -43,6 +44,7 @@ const NoteDarkTheme: ExtendedTheme = {
     trashBg: '#FE0000',
     paginationDisabled: '#7D7C7C',
     loadingOverlayBg: '#FFF6F6',
+    contactText: '#fff',
   },
 };
 

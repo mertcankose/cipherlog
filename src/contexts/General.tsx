@@ -21,7 +21,7 @@ const GeneralProvider: FC<IContextProvider> = ({children}) => {
   }, [isOnboarding]);
 
   const onBoardingControl = async () => {
-    // storage.delete('onboarding');
+    storage.delete('onboarding');
 
     try {
       let onboarding = storage.getString('onboarding');

@@ -2,8 +2,12 @@ import {createNavigationContainerRef} from '@react-navigation/native';
 
 export const navigationRef = createNavigationContainerRef();
 
-export function navigationPush(screenName: never) {
+export function navigatePush(screenName: any, params: any) {
   if (navigationRef.isReady()) {
-    navigationRef.navigate(screenName as never);
+    console.log('ready');
+    // @ts-ignore
+    navigationRef.navigate(screenName, params);
+  } else {
+    console.log('not ready');
   }
 }

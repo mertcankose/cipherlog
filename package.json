@@ -1,5 +1,5 @@
 {
-  "name": "NoteDapp",
+  "name": "cipherlog",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -45,6 +45,7 @@
     "react-native-randombytes": "^3.6.1",
     "react-native-reanimated": "^3.5.4",
     "react-native-redash": "^18.1.1",
+    "react-native-rename": "^3.2.13",
     "react-native-safe-area-context": "^4.7.3",
     "react-native-screens": "^3.26.0",
     "react-native-splash-screen": "^3.3.0",
