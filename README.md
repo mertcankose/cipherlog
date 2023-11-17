@@ -28,3 +28,9 @@ yarn start
 # Run on Simulator
 yarn ios / yarn android
 ```
+
+
+
+https://github.com/mertcankose/cipherlog/assets/56760896/1907ba06-4482-43fe-b11f-44c990bd74e7
+
+
