@@ -36,6 +36,7 @@ https://github.com/mertcankose/cipherlog/assets/56760896/1907ba06-4482-43fe-b11f
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+
 
 
